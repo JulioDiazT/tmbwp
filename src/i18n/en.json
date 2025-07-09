@@ -1,0 +1,112 @@
+{
+  "nav": {
+    "events": "EVENTS",
+    "projects": "PROJECTS",
+    "blog": "BLOG",
+    "join": "JOIN"
+  },
+  "footer": {
+    "follow": "Follow us",
+    "rights": "All rights reserved"
+  },
+   "hero": {
+    "title": "LET’S PEDAL TOGETHER WITH PURPOSE",
+    "subtitle": "JOIN THE RIDE FOR A BETTER FUTURE",
+    "cta": "UPCOMING EVENTS"
+  },
+  "three": {
+    "mobility": "WE ARE MOBILITY",
+    "community": "WE ARE COMMUNITY",
+    "city": "WE ARE CITY"
+  },
+  
+  "mission": {
+    "pre": "WE ARE YOUNG PEOPLE PEDALING FOR:",
+    "cities": "SAFER, HEALTHIER AND SUSTAINABLE CITIES",
+    "mid": "CONNECTING PEOPLE, SHARING KNOWLEDGE & SPARKING CHANGE",
+    "pedal": "ONE PEDAL AT A TIME"
+  },
+
+
+  "about": {
+    "cards": {
+      "ride": {
+        "title": "RIDE WITH PURPOSE",
+        "desc": "We organize themed bike rides to rediscover the city."
+      },
+      "learn": {
+        "title": "LEARN & SHARE",
+        "desc": "Basic mechanics and road‐safety workshops for everyone."
+      },
+      "change": {
+        "title": "WE SPARK CHANGE",
+        "desc": "Campaigns and actions that foster a vibrant cycling culture."
+      }
+    },
+    "testimonials": {
+      "show": "VIEW TESTIMONIAL",
+      "hide": "HIDE TESTIMONIAL"
+    }
+  },
+  "aboutTestimonials": {
+    "ride": {
+      "name": "Julio",
+      "age": "22 yrs",
+      "text": "Tomebambike changed how I experience Cuenca; now I ride every month with new friends."
+    },
+    "learn": {
+      "name": "Daniela",
+      "age": "24 yrs",
+      "text": "The workshops gave me the confidence to cycle safely on my own."
+    },
+    "change": {
+      "name": "Adrián",
+      "age": "23 yrs",
+      "text": "Joining the campaigns helped me see the social power of the bicycle."
+    }
+  },
+
+  "events": {
+    "upcoming": "Upcoming events",
+    "join": "Join"
+  },
+  "metrics": {
+    "title": "Our impact",
+    "rides": "Bike rides",
+    "workshops": "Workshops",
+    "people": "Participants",
+    "co2": "t CO₂ avoided",
+    "km": "Kilometres ridden",
+    "speakers": "Speakers"
+  },
+
+  "common": {
+    "join": "Join the change!"
+  },
+  
+  "team": {
+    "tag": "Meet the crew",
+    "title": "The energy behind Tomebambike",
+    "members": {
+      "adrian": {
+        "name": "Adrián Bermeo Tosi, 23",
+        "pronouns": "(He/Him)",
+        "bio": "Clinical Psychology student and  S2Cities 2024 volunteer. Passionate about youth spaces and healthy, sustainable communities."
+      },
+      "julio": {
+        "name": "Julio Díaz Torres, 27",
+        "pronouns": "(He/Him)",
+        "bio": "Lawyer & software developer from Ecuador. Tomebambike founder and S2Cities 2024 volunteer; loves the right-to-the-city debate and data-driven impact."
+      },
+      "daniela": {
+        "name": "Daniela Sigua Rey, 22",
+        "pronouns": "(She/Her)",
+        "bio": "International Studies student focused on social & environmental impact, actively creating positive change in communities."
+      }
+    }
+  }
+
+
+}
+
+

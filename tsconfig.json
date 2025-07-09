@@ -1,0 +1,36 @@
+{
+  "compilerOptions": {
+    /* destino / módulos */
+    "target": "ESNext",
+    "module": "ESNext",
+    "lib": ["DOM", "DOM.Iterable", "ESNext"],
+    "jsx": "react-jsx",
+    "moduleResolution": "Node",
+
+    /* compatibilidad */
+    "allowSyntheticDefaultImports": true,
+    "skipLibCheck": true,
+    "types": ["vite/client"],
+
+    /* alias "@" -> src */
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["src/*"]
+    },
+
+    /* verificación */
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true,
+
+    /* otros */
+    "isolatedModules": true,
+    "useDefineForClassFields": true,
+    "noEmit": true
+  },
+  "include": ["src"],
+  "references": [
+    { "path": "./tsconfig.node.json" }
+  ]
+}
