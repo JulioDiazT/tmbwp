@@ -1,9 +1,7 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import Header from './components/Header'
 import Home from './pages/Home'
-import Footer from './components/Footer'
 import EventsPreview from './components/EventsPreview'
-import MapSection from './components/MapSection'
 
 
 export default function App() {
