@@ -1,15 +1,15 @@
 {
   "nav": {
     "events": "EVENTS",
-    "projects": "PROJECTS",
-    "blog": "BLOG",
+    "memories": "MEMORIES",
+    "volunteer": "VOLUNTEER",
     "join": "JOIN"
   },
   "footer": {
     "follow": "Follow us",
     "rights": "All rights reserved"
   },
-   "hero": {
+  "hero": {
     "title": "LET’S PEDAL TOGETHER WITH PURPOSE",
     "subtitle": "JOIN THE RIDE FOR A BETTER FUTURE",
     "cta": "UPCOMING EVENTS"
@@ -19,15 +19,12 @@
     "community": "WE ARE COMMUNITY",
     "city": "WE ARE CITY"
   },
-  
   "mission": {
     "pre": "WE ARE YOUNG PEOPLE PEDALING FOR:",
     "cities": "SAFER, HEALTHIER AND SUSTAINABLE CITIES",
     "mid": "CONNECTING PEOPLE, SHARING KNOWLEDGE & SPARKING CHANGE",
     "pedal": "ONE PEDAL AT A TIME"
   },
-
-
   "about": {
     "cards": {
       "ride": {
@@ -65,7 +62,6 @@
       "text": "Joining the campaigns helped me see the social power of the bicycle."
     }
   },
-
   "events": {
     "upcoming": "Upcoming events",
     "join": "Join"
@@ -79,11 +75,9 @@
     "km": "Kilometres ridden",
     "speakers": "Speakers"
   },
-
   "common": {
     "join": "Join the change!"
   },
-  
   "team": {
     "tag": "Meet the crew",
     "title": "The energy behind Tomebambike",
@@ -104,9 +98,111 @@
         "bio": "International Studies student focused on social & environmental impact, actively creating positive change in communities."
       }
     }
+  },
+ 
+  "volunteer": {
+    "banner": {
+      "title": "JOIN OUR VOLUNTEER TEAM",
+      "subtitle": "Collaborate with Tomebambike and transform your city on two wheels"
+    },
+    "benefits": {
+      "title": "WHAT YOU GAIN AS A VOLUNTEER",
+      "subtitle": "Join #BuildingTheCity and discover all the exclusive perks.",
+      "items": {
+        "impactSkills": {
+          "title": "IMPACT SKILLS",
+          "desc": "Master event management and strategic communication."
+        },
+        "networking": {
+          "title": "COLLABORATION NETWORK",
+          "desc": "Connect with professionals, NGOs and urban leaders."
+        },
+        "recognition": {
+          "title": "OFFICIAL RECOGNITION",
+          "desc": "Participation certificate and letter of recommendation."
+        },
+        "personalGrowth": {
+          "title": "PERSONAL GROWTH",
+          "desc": "Boost your confidence and amplify your civic voice."
+        }
+      }
+    },
+    "positionsTitle": "OPEN CALLS",
+    "positions": {
+      "designer": {
+        "title": "GRAPHIC DESIGNER",
+        "desc": "We’re looking for someone fluent in Adobe Illustrator with urban design passion."
+      },
+      "comms": {
+        "title": "COMMUNICATOR",
+        "desc": "Experience in social media and creative writing to amplify our voice."
+      },
+      "architect": {
+        "title": "ARCHITECT",
+        "desc": "Interest in public space and sustainable mobility to design safe routes."
+      },
+      "sociologist": {
+        "title": "SOCIOLOGIST",
+        "desc": "Knowledge in citizen participation and social impact evaluation."
+      },
+      "cta": "APPLY NOW"
+    }
+  },
+  "memories": {
+    "banner": {
+      "title": "EVERY MEMORABLE JOURNEY BEGINS WITH A…",
+      "subtitle": "What are you up to this Saturday?"
+    },
+    "timeline": {
+      "2019": {
+        "year": "2019",
+        "title": "Our first pedal",
+        "desc": "Julio grew up biking and in 2019 launched Tomebambike to promote urban cycling..."
+      },
+      "2024": {
+        "year": "2024",
+        "title": "Meeting Adrián",
+        "desc": "Through Safe And Sound Cities we met Adrián, organized our first group ride..."
+      },
+      "uda": {
+        "year": "2025",
+        "title": "UDA on Wheels pilot",
+        "desc": "Partnered with Universidad del Azuay for workshops, mechanics, safety..."
+      },
+      "partners": {
+        "year": "2025",
+        "title": "Growing alliances",
+        "desc": "Joined forces with Cuenca Bike Tours, Prefectura del Azuay, Bio Parque Amaru..."
+      }
+    }
+  },
+  "memories": {
+    "banner": {
+      "title": "TODO LO MEMORABLE COMIENZA CON UN…",
+      "subtitle": "¿Qué haces este sábado?"
+    },
+    "timeline": {
+      "2019": {
+        "year": "2019",
+        "title": "Nuestro primer pedal",
+        "desc": "Julio creció en bici y en 2019 lanzó Tomebambike para promover el ciclismo urbano..."
+      },
+      "2024": {
+        "year": "2024",
+        "title": "Encuentro con Adrián",
+        "desc": "A través de Safe And Sound Cities conocimos a Adrián y organizamos nuestro primer ciclopaseo..."
+      },
+      "uda": {
+        "year": "2025",
+        "title": "Piloto UDA sobre Ruedas",
+        "desc": "Aliados con la Universidad del Azuay para talleres de mecánica, seguridad vial..."
+      },
+      "partners": {
+        "year": "2025",
+        "title": "Alianzas crecientes",
+        "desc": "Junto a Cuenca Bike Tours, Prefectura del Azuay, BioParque Amaru..."
+      }
+    }
   }
-
-
 }
-
 

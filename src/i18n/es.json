@@ -1,8 +1,8 @@
 {
   "nav": {
     "events": "EVENTOS",
-    "projects": "PROYECTOS",
-    "blog": "BLOG",
+    "memories": "RECUERDOS",
+    "volunteer": "VOLUNTARIADO",
     "join": "ÚNETE"
   },
   "footer": {
@@ -96,6 +96,82 @@
         "name": "Daniela Sigua Rey, 22",
         "pronouns": "(Ella/She)",
         "bio": "Estudiante de Estudios Internacionales. Comprometida con el impacto socioambiental y proyectos que transforman comunidades."
+      }
+    }
+  },
+  "volunteer": {
+    "banner": {
+      "title": "ÚNETE A NUESTRO VOLUNTARIADO",
+      "subtitle": "Colabora con Tomebambike y tranformemos Cuenca un pedal a la vez"
+    },
+    "benefits": {
+      "title": "¿QUÉ GANAS COMO VOLUNTARIO?",
+      "subtitle": "Sumate y descubre todos los beneficios exclusivos.",
+      "items": {
+        "impactSkills": {
+          "title": "HABILIDADES DE IMPACTO",
+          "desc": "Domina la gestión de eventos y la comunicación estratégica."
+        },
+        "networking": {
+          "title": "RED DE COLABORACIÓN",
+          "desc": "Conecta con profesionales, ONG y líderes urbanos."
+        },
+        "recognition": {
+          "title": "RECONOCIMIENTO OFICIAL",
+          "desc": "Certificado de participación y carta de recomendación."
+        },
+        "personalGrowth": {
+          "title": "CRECIMIENTO PERSONAL",
+          "desc": "Fortalece tu confianza y potencia tu voz ciudadana."
+        }
+      }
+    },
+    "positionsTitle": "CONVOCATORIAS ABIERTAS",
+    "positions": {
+      "designer": {
+        "title": "DISEÑADOR/A GRÁFICO/A",
+        "desc": "Buscamos a alguien con dominio de Adobe Illustrator y pasión por el diseño urbano."
+      },
+      "comms": {
+        "title": "COMUNICADOR/A",
+        "desc": "Experiencia en redes sociales y redacción creativa para amplificar nuestra voz."
+      },
+      "architect": {
+        "title": "ARQUITECTO/A",
+        "desc": "Interés en espacio público y movilidad sostenible para diseñar rutas seguras."
+      },
+      "sociologist": {
+        "title": "SOCIÓLOGO/A",
+        "desc": "Conocimientos en participación ciudadana y evaluación de impacto social."
+      },
+      "cta": "POSTULARSE"
+    }
+  },
+  "memories": {
+    "banner": {
+      "title": "TODO LO MEMORABLE COMIENZA CON UN…",
+      "subtitle": "¿Qué haces este sábado?"
+    },
+    "timeline": {
+      "2019": {
+        "year": "2019",
+        "title": "Nuestro primer pedal",
+        "desc": "Julio creció en bici y en 2019 lanzó Tomebambike para promover el ciclismo urbano..."
+      },
+      "2024": {
+        "year": "2024",
+        "title": "Encuentro con Adrián",
+        "desc": "A través de Safe And Sound Cities conocimos a Adrián y organizamos nuestro primer ciclopaseo..."
+      },
+      "uda": {
+        "year": "2025",
+        "title": "Piloto UDA sobre Ruedas",
+        "desc": "Aliados con la Universidad del Azuay para talleres de mecánica, seguridad vial..."
+      },
+      "partners": {
+        "year": "2025",
+        "title": "Alianzas crecientes",
+        "desc": "Junto a Cuenca Bike Tours, Prefectura del Azuay, BioParque Amaru..."
       }
     }
   }
