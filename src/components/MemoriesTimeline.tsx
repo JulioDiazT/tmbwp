@@ -23,24 +23,28 @@ const MemoriesTimeline: FC = () => {
   const containerRef = useRef<HTMLDivElement>(null)
 
   useLayoutEffect(() => {
-    if (!containerRef.current) return
+    const container = containerRef.current
+    if (!container) return
 
-    // Por cada .hito-item configuramos un ScrollTrigger individual
-    gsap.utils.toArray<HTMLDivElement>('.hito-item').forEach((el, i) => {
-      gsap.from(el, {
-        scrollTrigger: {
-          trigger: el,
-          start: 'top 80%',
-          end: 'bottom 60%',
-          scrub: false,
-          // markers: true,
-        },
-        x: i % 2 === 0 ? -200 : 200,
-        opacity: 0,
-        duration: 0.8,
-        ease: 'power2.out'
-      })
-    })
+    const ctx = gsap.context(() => {
+      container
+        .querySelectorAll<HTMLDivElement>('.hito-item')
+        .forEach((el, i) => {
+          gsap.from(el, {
+            scrollTrigger: {
+              trigger: el,
+              start: 'top 80%',
+              toggleActions: 'play none none reverse'
+            },
+            x: i % 2 === 0 ? -150 : 150,
+            opacity: 0,
+            duration: 0.8,
+            ease: 'power2.out'
+          })
+        })
+    }, containerRef)
+
+    return () => ctx.revert()
   }, [])
 
   return (

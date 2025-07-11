@@ -16,35 +16,42 @@ const BannerMemories: FC = () => {
   useLayoutEffect(() => {
     if (!bannerRef.current) return
 
-    // Pin del banner
-    ScrollTrigger.create({
-      trigger: bannerRef.current,
-      start: 'top top',
-      end: '+=200%',
-      pin: true,
-      pinSpacing: false
-    })
-
-    // Animación entrada del título
-    gsap.from(titleRef.current, {
-      scrollTrigger: {
+    const ctx = gsap.context(() => {
+      ScrollTrigger.create({
         trigger: bannerRef.current,
-        start: 'top top+=50',
-        end: 'bottom top',
-        scrub: true,
-      },
-      y: 100,
-      opacity: 0,
-      ease: 'power2.out'
-    })
+        start: 'top top',
+        end: '+=150%',
+        pin: true
+      })
 
-    // Subtítulo con loop de “latido”
-    const tl = gsap.timeline({ repeat: -1, yoyo: true, delay: 1 })
-    tl.to(subtitleRef.current, {
-      scale: 1.1,
-      duration: 0.6,
-      ease: 'sine.inOut'
-    })
+      const tl = gsap.timeline()
+      tl.from(titleRef.current, {
+        y: 80,
+        opacity: 0,
+        duration: 1,
+        ease: 'power2.out'
+      }).from(
+        subtitleRef.current,
+        {
+          y: 40,
+          opacity: 0,
+          duration: 1,
+          ease: 'power2.out'
+        },
+        '-=0.5'
+      )
+
+      gsap.to(subtitleRef.current, {
+        scale: 1.1,
+        duration: 0.6,
+        ease: 'sine.inOut',
+        repeat: -1,
+        yoyo: true,
+        delay: 1
+      })
+    }, bannerRef)
+
+    return () => ctx.revert()
   }, [])
 
   return (
