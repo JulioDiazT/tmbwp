@@ -2,7 +2,7 @@
 import { FC, useRef, useLayoutEffect } from 'react'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
-import heroImg from '../assets/banner-recuerdos.jpg' // tu imagen de banner
+import heroImg from '../assets/banner-recuerdos.jpg'
 import { useTranslation } from 'react-i18next'
 
 gsap.registerPlugin(ScrollTrigger)
@@ -13,10 +13,14 @@ const BannerMemories: FC = () => {
   const titleRef = useRef<HTMLHeadingElement>(null)
   const subtitleRef = useRef<HTMLParagraphElement>(null)
 
+  const title = t('memories.banner.title', 'TODO LO MEMORABLE COMIENZA CON UN...')
+  const subtitle = t('memories.banner.subtitle', '¿QUÉ HACES ESTE SÁBADO?')
+  const titleWords = title.split(' ')
+  const subtitleWords = subtitle.split(' ')
+
   useLayoutEffect(() => {
     if (!bannerRef.current) return
 
-    // Pin del banner
     ScrollTrigger.create({
       trigger: bannerRef.current,
       start: 'top top',
@@ -25,26 +29,25 @@ const BannerMemories: FC = () => {
       pinSpacing: false
     })
 
-    // Animación entrada del título
-    gsap.from(titleRef.current, {
-      scrollTrigger: {
-        trigger: bannerRef.current,
-        start: 'top top+=50',
-        end: 'bottom top',
-        scrub: true,
-      },
-      y: 100,
-      opacity: 0,
-      ease: 'power2.out'
-    })
+    const ctx = gsap.context(() => {
+      const words = bannerRef.current!.querySelectorAll('.banner-word')
 
-    // Subtítulo con loop de “latido”
-    const tl = gsap.timeline({ repeat: -1, yoyo: true, delay: 1 })
-    tl.to(subtitleRef.current, {
-      scale: 1.1,
-      duration: 0.6,
-      ease: 'sine.inOut'
-    })
+      gsap.timeline({
+        scrollTrigger: {
+          trigger: bannerRef.current,
+          start: 'top top',
+          end: 'bottom top',
+          scrub: true
+        }
+      }).from(words, {
+        opacity: 0,
+        yPercent: 100,
+        stagger: 0.05,
+        ease: 'power2.out'
+      })
+    }, bannerRef)
+
+    return () => ctx.revert()
   }, [])
 
   return (
@@ -65,13 +68,21 @@ const BannerMemories: FC = () => {
           ref={titleRef}
           className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold text-white uppercase leading-tight"
         >
-          {t('memories.banner.title', 'TODO LO MEMORABLE COMIENZA CON UN...')}
+          {titleWords.map((w, i) => (
+            <span key={i} className="banner-word inline-block mr-2">
+              {w}
+            </span>
+          ))}
         </h1>
         <p
           ref={subtitleRef}
           className="mt-6 text-2xl sm:text-3xl font-semibold text-yellow-400 uppercase"
         >
-          {t('memories.banner.subtitle', '¿QUÉ HACES ESTE SÁBADO?')}
+          {subtitleWords.map((w, i) => (
+            <span key={i} className="banner-word inline-block mr-1">
+              {w}
+            </span>
+          ))}
         </p>
       </div>
     </section>
