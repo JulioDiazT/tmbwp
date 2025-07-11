@@ -175,34 +175,6 @@
         "desc": "Joined forces with Cuenca Bike Tours, Prefectura del Azuay, Bio Parque Amaru..."
       }
     }
-  },
-  "memories": {
-    "banner": {
-      "title": "TODO LO MEMORABLE COMIENZA CON UN…",
-      "subtitle": "¿Qué haces este sábado?"
-    },
-    "timeline": {
-      "2019": {
-        "year": "2019",
-        "title": "Nuestro primer pedal",
-        "desc": "Julio creció en bici y en 2019 lanzó Tomebambike para promover el ciclismo urbano..."
-      },
-      "2024": {
-        "year": "2024",
-        "title": "Encuentro con Adrián",
-        "desc": "A través de Safe And Sound Cities conocimos a Adrián y organizamos nuestro primer ciclopaseo..."
-      },
-      "uda": {
-        "year": "2025",
-        "title": "Piloto UDA sobre Ruedas",
-        "desc": "Aliados con la Universidad del Azuay para talleres de mecánica, seguridad vial..."
-      },
-      "partners": {
-        "year": "2025",
-        "title": "Alianzas crecientes",
-        "desc": "Junto a Cuenca Bike Tours, Prefectura del Azuay, BioParque Amaru..."
-      }
-    }
   }
-}
 
+}
