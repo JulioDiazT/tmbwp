@@ -25,28 +25,41 @@ const MemoriesTimeline: FC = () => {
   useLayoutEffect(() => {
     if (!containerRef.current) return
 
-    // Por cada .hito-item configuramos un ScrollTrigger individual
-    gsap.utils.toArray<HTMLDivElement>('.hito-item').forEach((el, i) => {
+    const sections = gsap.utils.toArray<HTMLDivElement>('.hito-item')
+
+    gsap.to(sections, {
+      xPercent: -100 * (sections.length - 1),
+      ease: 'none',
+      scrollTrigger: {
+        trigger: containerRef.current,
+        start: 'top top',
+        end: () => `+=${containerRef.current!.offsetWidth * sections.length}`,
+        scrub: true,
+        pin: true,
+        anticipatePin: 1,
+        id: 'timeline'
+      }
+    })
+
+    sections.forEach((el) => {
       gsap.from(el, {
+        opacity: 0,
+        y: 50,
         scrollTrigger: {
           trigger: el,
-          start: 'top 80%',
-          end: 'bottom 60%',
-          scrub: false,
-          // markers: true,
-        },
-        x: i % 2 === 0 ? -200 : 200,
-        opacity: 0,
-        duration: 0.8,
-        ease: 'power2.out'
+          containerAnimation: ScrollTrigger.getById('timeline')?.animation as gsap.core.Animation,
+          start: 'left center',
+          end: 'right center',
+          scrub: true
+        }
       })
     })
   }, [])
 
   return (
-    <section className="py-24 bg-gray-100" ref={containerRef}>
-      <div className="mx-auto max-w-5xl px-4 space-y-16">
-        {HITOS.map((hito, i) => {
+    <section ref={containerRef} className="timeline-section h-screen bg-gray-100 overflow-hidden">
+      <div className="timeline-wrapper flex h-full">
+        {HITOS.map((hito) => {
           const data = t(`memories.timeline.${hito.key}`, { returnObjects: true }) as {
             year: string
             title: string
@@ -56,16 +69,14 @@ const MemoriesTimeline: FC = () => {
           return (
             <div
               key={hito.key}
-              className={`hito-item flex flex-col md:flex-row items-center gap-8 ${
-                i % 2 ? 'md:flex-row-reverse' : ''
-              }`}
+              className="hito-item w-[70vw] flex-shrink-0 flex flex-col items-center justify-center gap-6 px-8"
             >
               <img
                 src={hito.img}
                 alt={data.title}
-                className="w-full md:w-1/2 h-60 object-cover rounded-lg shadow-lg"
+                className="w-full h-60 object-cover rounded-lg shadow-lg"
               />
-              <div className="md:w-1/2 text-center md:text-left">
+              <div className="text-center">
                 <span className="text-primary font-bold text-lg">{data.year}</span>
                 <h3 className="mt-2 text-2xl font-semibold text-andesnavy">{data.title}</h3>
                 <p className="mt-2 text-gray-700">{data.desc}</p>

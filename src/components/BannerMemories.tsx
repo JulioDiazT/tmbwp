@@ -14,36 +14,53 @@ const BannerMemories: FC = () => {
   const subtitleRef = useRef<HTMLParagraphElement>(null)
 
   useLayoutEffect(() => {
-    if (!bannerRef.current) return
+    if (!bannerRef.current || !titleRef.current || !subtitleRef.current) return
 
     // Pin del banner
     ScrollTrigger.create({
       trigger: bannerRef.current,
       start: 'top top',
-      end: '+=200%',
+      end: '+=150%',
       pin: true,
       pinSpacing: false
     })
 
-    // Animación entrada del título
-    gsap.from(titleRef.current, {
+    // Animación secuencial de palabras del título
+    gsap.from(titleRef.current.children, {
       scrollTrigger: {
         trigger: bannerRef.current,
-        start: 'top top+=50',
-        end: 'bottom top',
-        scrub: true,
+        start: 'top top',
+        end: '+=50%',
+        scrub: true
       },
-      y: 100,
+      y: 80,
+      opacity: 0,
+      stagger: 0.15,
+      ease: 'power2.out'
+    })
+
+    // Aparición del subtítulo
+    gsap.from(subtitleRef.current, {
+      scrollTrigger: {
+        trigger: bannerRef.current,
+        start: 'top+=40% top',
+        end: 'bottom top',
+        scrub: true
+      },
+      y: 60,
       opacity: 0,
       ease: 'power2.out'
     })
 
-    // Subtítulo con loop de “latido”
-    const tl = gsap.timeline({ repeat: -1, yoyo: true, delay: 1 })
-    tl.to(subtitleRef.current, {
-      scale: 1.1,
-      duration: 0.6,
-      ease: 'sine.inOut'
+    // Desvanecer banner al salir
+    gsap.to(bannerRef.current, {
+      scrollTrigger: {
+        trigger: bannerRef.current,
+        start: 'bottom top',
+        end: 'bottom top+=25%',
+        scrub: true
+      },
+      opacity: 0
     })
   }, [])
 
@@ -65,7 +82,13 @@ const BannerMemories: FC = () => {
           ref={titleRef}
           className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold text-white uppercase leading-tight"
         >
-          {t('memories.banner.title', 'TODO LO MEMORABLE COMIENZA CON UN...')}
+          {t('memories.banner.title', 'TODO LO MEMORABLE COMIENZA CON UN...')
+            .split(' ')
+            .map((w, i) => (
+              <span key={i} className="inline-block mr-2">
+                {w}
+              </span>
+            ))}
         </h1>
         <p
           ref={subtitleRef}
