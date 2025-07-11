@@ -21,33 +21,52 @@ const HITOS: Hito[] = [
 const MemoriesTimeline: FC = () => {
   const { t } = useTranslation()
   const containerRef = useRef<HTMLDivElement>(null)
+  const trackRef = useRef<HTMLDivElement>(null)
 
   useLayoutEffect(() => {
-    if (!containerRef.current) return
+    if (!containerRef.current || !trackRef.current) return
 
-    // Por cada .hito-item configuramos un ScrollTrigger individual
-    gsap.utils.toArray<HTMLDivElement>('.hito-item').forEach((el, i) => {
-      gsap.from(el, {
+    const ctx = gsap.context(() => {
+      const distance = trackRef.current!.scrollWidth - containerRef.current!.clientWidth
+
+      const horizontal = gsap.to(trackRef.current, {
+        x: () => -distance,
+        ease: 'none',
         scrollTrigger: {
-          trigger: el,
-          start: 'top 80%',
-          end: 'bottom 60%',
-          scrub: false,
-          // markers: true,
-        },
-        x: i % 2 === 0 ? -200 : 200,
-        opacity: 0,
-        duration: 0.8,
-        ease: 'power2.out'
+          id: 'memories-h-scroll',
+          trigger: containerRef.current,
+          start: 'top top',
+          end: () => `+=${distance}`,
+          scrub: 1,
+          pin: true,
+          anticipatePin: 1
+        }
       })
-    })
+
+      gsap.utils.toArray<HTMLDivElement>('.hito-item').forEach((el) => {
+        gsap.from(el, {
+          opacity: 0,
+          scale: 0.9,
+          duration: 0.6,
+          scrollTrigger: {
+            trigger: el,
+            containerAnimation: horizontal,
+            start: 'left center'
+          }
+        })
+      })
+    }, containerRef)
+
+    return () => ctx.revert()
   }, [])
 
   return (
     <section className="py-24 bg-gray-100" ref={containerRef}>
-      <div className="mx-auto max-w-5xl px-4 space-y-16">
-        {HITOS.map((hito, i) => {
-          const data = t(`memories.timeline.${hito.key}`, { returnObjects: true }) as {
+      <div ref={trackRef} className="flex w-max">
+        {HITOS.map((hito) => {
+          const data = t(`memories.timeline.${hito.key}`, {
+            returnObjects: true
+          }) as {
             year: string
             title: string
             desc: string
@@ -56,9 +75,7 @@ const MemoriesTimeline: FC = () => {
           return (
             <div
               key={hito.key}
-              className={`hito-item flex flex-col md:flex-row items-center gap-8 ${
-                i % 2 ? 'md:flex-row-reverse' : ''
-              }`}
+              className="hito-item flex-none w-screen px-6 flex flex-col md:flex-row items-center gap-8"
             >
               <img
                 src={hito.img}
