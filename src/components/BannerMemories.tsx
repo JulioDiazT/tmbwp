@@ -10,41 +10,55 @@ gsap.registerPlugin(ScrollTrigger)
 const BannerMemories: FC = () => {
   const { t } = useTranslation()
   const bannerRef = useRef<HTMLElement>(null)
+  const bgRef = useRef<HTMLDivElement>(null)
   const titleRef = useRef<HTMLHeadingElement>(null)
   const subtitleRef = useRef<HTMLParagraphElement>(null)
 
   useLayoutEffect(() => {
     if (!bannerRef.current) return
 
-    // Pin del banner
-    ScrollTrigger.create({
-      trigger: bannerRef.current,
-      start: 'top top',
-      end: '+=200%',
-      pin: true,
-      pinSpacing: false
-    })
-
-    // Animación entrada del título
-    gsap.from(titleRef.current, {
-      scrollTrigger: {
+    const ctx = gsap.context(() => {
+      // Pin del banner
+      ScrollTrigger.create({
         trigger: bannerRef.current,
-        start: 'top top+=50',
-        end: 'bottom top',
-        scrub: true,
-      },
-      y: 100,
-      opacity: 0,
-      ease: 'power2.out'
-    })
+        start: 'top top',
+        end: '+=200%',
+        pin: true,
+        pinSpacing: false
+      })
 
-    // Subtítulo con loop de “latido”
-    const tl = gsap.timeline({ repeat: -1, yoyo: true, delay: 1 })
-    tl.to(subtitleRef.current, {
-      scale: 1.1,
-      duration: 0.6,
-      ease: 'sine.inOut'
-    })
+      // Parallax del fondo
+      gsap.to(bgRef.current, {
+        scale: 1.2,
+        scrollTrigger: {
+          trigger: bannerRef.current,
+          start: 'top top',
+          end: 'bottom top',
+          scrub: true
+        }
+      })
+
+      // Animación entrada del título
+      gsap.from(titleRef.current, {
+        y: 100,
+        opacity: 0,
+        duration: 1,
+        ease: 'power4.out',
+        scrollTrigger: {
+          trigger: bannerRef.current,
+          start: 'top center'
+        }
+      })
+
+      // Subtítulo con loop de “latido”
+      gsap.timeline({ repeat: -1, yoyo: true, delay: 1 }).to(subtitleRef.current, {
+        scale: 1.1,
+        duration: 0.6,
+        ease: 'sine.inOut'
+      })
+    }, bannerRef)
+
+    return () => ctx.revert()
   }, [])
 
   return (
@@ -54,6 +68,7 @@ const BannerMemories: FC = () => {
     >
       {/* Background */}
       <div
+        ref={bgRef}
         className="absolute inset-0 bg-center bg-cover"
         style={{ backgroundImage: `url(${heroImg})` }}
       />
