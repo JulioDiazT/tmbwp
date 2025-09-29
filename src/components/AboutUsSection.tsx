@@ -10,7 +10,6 @@ import t3 from '../assets/t3.png';
 
 // Avatares de testimonios
 import pia from '../assets/pia.png';
-import daniela from '../assets/dani.png';
 import adrian from '../assets/adri.png';
 
 type CategoryKey = 'ride' | 'learn' | 'change';

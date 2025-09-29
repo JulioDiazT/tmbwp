@@ -1,7 +1,6 @@
-import React, { FC, useLayoutEffect, useRef } from 'react';
+import React, { useLayoutEffect, useRef } from 'react';
 import BannerMemories     from '../components/BannerMemories';
 import MemoriesGallery    from '../components/MemoriesGallery';
-import SocialMediaSection from '../components/SocialMediaSection';
 import PedalsBlog from '../components/PedalsBlog';
 
 // Hook mínimo para garantizar scroll-top al montar y foco accesible

@@ -1,5 +1,5 @@
 // src/components/PedalsBlog.tsx
-import React, { FC, useState } from "react";
+import { FC, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { motion, AnimatePresence } from "framer-motion";
 
