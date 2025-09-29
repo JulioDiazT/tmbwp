@@ -1,8 +1,9 @@
 {
   "nav": {
-    "events": "EVENTS",
     "memories": "MEMORIES",
     "volunteer": "VOLUNTEER",
+    "CycleStacks": "CYCLESTACKS",
+
     "join": "JOIN"
   },
   "footer": {
@@ -25,19 +26,20 @@
     "mid": "CONNECTING PEOPLE, SHARING KNOWLEDGE & SPARKING CHANGE",
     "pedal": "ONE PEDAL AT A TIME"
   },
-  "about": {
+ "about": {
+    "inviteTitle": "WE INVITE YOU TO…",
     "cards": {
       "ride": {
         "title": "RIDE WITH PURPOSE",
-        "desc": "We organize themed bike rides to rediscover the city."
+        "desc": "On our rides you exercise, make friends, and rediscover the city. Each outing has a theme—we learn and contribute to a safer city."
       },
       "learn": {
         "title": "LEARN & SHARE",
-        "desc": "Basic mechanics and road‐safety workshops for everyone."
+        "desc": "Through road-safety, basic mechanics and beginner cycling workshops, we build a safe, responsible cycling culture by sharing knowledge and experience."
       },
       "change": {
         "title": "WE SPARK CHANGE",
-        "desc": "Campaigns and actions that foster a vibrant cycling culture."
+        "desc": "Through community and our events, we organize to promote sustainable mobility and help shape a safer, healthier and more sustainable city for everyone."
       }
     },
     "testimonials": {
@@ -46,12 +48,12 @@
     }
   },
   "aboutTestimonials": {
-    "ride": {
-      "name": "Julio",
-      "age": "22 yrs",
-      "text": "Tomebambike changed how I experience Cuenca; now I ride every month with new friends."
-    },
     "learn": {
+      "name": "María Piedad",
+      "age": "27 yrs",
+      "text": "Before coming to the workshop, I was really scared—panicked around cars and wasn’t confident in my balance. Now it’s the complete opposite. I loved the workshop; cycling along the riverbank and connecting with nature was an incredible experience. I got my confidence back."
+    },
+    "ride": {
       "name": "Daniela",
       "age": "24 yrs",
       "text": "The workshops gave me the confidence to cycle safely on my own."
@@ -75,7 +77,7 @@
     "km": "Kilometres ridden",
     "speakers": "Speakers"
   },
-  "common": {
+  "common_1": {
     "join": "Join the change!"
   },
   "team": {
@@ -98,6 +100,13 @@
         "bio": "International Studies student focused on social & environmental impact, actively creating positive change in communities."
       }
     }
+  },
+  
+  "alliances": {
+    "title": "OUR ALLIANCES",
+    "primary": "PRIMARY ALLIES",
+    "institutions": "PARTNER INSTITUTIONS",
+    "sponsors": "SPONSORS"
   },
  
   "volunteer": {
@@ -179,35 +188,43 @@
       "title": "Together we create the best memories"
     }
   },
-  "memories": {
-    "banner": {
-      "title": "TODO LO MEMORABLE COMIENZA CON UN…",
-      "subtitle": "¿Qué haces este sábado?"
-    },
-    "timeline": {
-      "2019": {
-        "year": "2019",
-        "title": "Nuestro primer pedal",
-        "desc": "Julio creció en bici y en 2019 lanzó Tomebambike para promover el ciclismo urbano..."
-      },
-      "2024": {
-        "year": "2024",
-        "title": "Encuentro con Adrián",
-        "desc": "A través de Safe And Sound Cities conocimos a Adrián y organizamos nuestro primer ciclopaseo..."
-      },
-      "uda": {
-        "year": "2025",
-        "title": "Piloto UDA sobre Ruedas",
-        "desc": "Aliados con la Universidad del Azuay para talleres de mecánica, seguridad vial..."
-      },
-      "partners": {
-        "year": "2025",
-        "title": "Alianzas crecientes",
-        "desc": "Junto a Cuenca Bike Tours, Prefectura del Azuay, BioParque Amaru..."
-      }
-    },
-    "gallery": {
-      "title": "Together we create the best memories"
+  "common": {
+    "loading": "Loading…",
+    "error": "Something went wrong"
+  },
+  "cyclestacks": {
+    "brand": "CycleStacks",
+    "tagline": "An open cycling library by and for the community",
+    "home": "Home",
+    "contribute": "Suggest a book",
+    "clear": "Clear",
+    "searchLabel": "Search by title or author",
+    "searchPh": "Type a title or author…",
+    "searchAria": "Search books",
+    "empty": "No books yet. Be the first to suggest one!",
+    "footer": "Made with ♥ from Tomebambike — {{brand}}",
+    "author": "Author",
+    "year": "Year",
+    "download": "Download",
+    "openNew": "Open in new tab",
+    "suggestRelated": "Suggest related",
+    "maybe": "You may also like",
+    "noSuggestions": "No suggestions yet",
+    "missing": "We couldn't find this book.",
+    "back": "Go back",
+
+    "mail": {
+      "subject": "Book suggestion for CycleStacks",
+      "hi": "Hi Tomebambike,",
+      "propose": "I'd like to suggest a book for the library:",
+      "title": "• Title:",
+      "author": "• Author:",
+      "year": "• Year:",
+      "desc": "• Short description:",
+      "link": "• Link to file or record:",
+      "license": "• License/permission (if any):",
+      "contact": "• My contact:",
+      "related": "I want to suggest books related to: {{title}}"
     }
   }
 }

@@ -1,8 +1,8 @@
 {
   "nav": {
-    "events": "EVENTOS",
     "memories": "RECUERDOS",
     "volunteer": "VOLUNTARIADO",
+    "CycleStacks": "CICLOTECA",
     "join": "ÚNETE"
   },
   "footer": {
@@ -26,18 +26,19 @@
     "pedal": "UN PEDAL A LA VEZ"
   },
   "about": {
+    "inviteTitle": "TE INVITAMOS A…",
     "cards": {
       "ride": {
-        "title": "PEDALEA CON PROPÓSITO",
-        "desc": "Organizamos ciclopaseos temáticos para redescubrir la ciudad."
+        "title": "PEDALEAR CON PROPÓSITO",
+        "desc": "En nuestros ciclopaseos haces ejercicio, creas amistades y redescubres la ciudad. Cada salida es temática: aprendemos y aportamos a una ciudad más segura."
       },
       "learn": {
-        "title": "APRENDE Y COMPARTE",
-        "desc": "Talleres de mecánica básica y seguridad vial para todos."
+        "title": "APRENDER Y COMPARTIR",
+        "desc": "Con talleres de seguridad vial, mecánica básica y ciclismo para principiantes, fortalecemos una cultura ciclista segura y responsable, compartiendo conocimientos y experiencias."
       },
       "change": {
-        "title": "ACTIVAMOS EL CAMBIO",
-        "desc": "Campañas y acciones que fomentan una cultura ciclista viva."
+        "title": "ACTIVAR EL CAMBIO",
+        "desc": "Desde la comunidad y nuestros eventos, nos organizamos para impulsar la movilidad sostenible e incidir en la construcción de una ciudad más segura, saludable y sostenible para todas las personas."
       }
     },
     "testimonials": {
@@ -46,12 +47,12 @@
     }
   },
   "aboutTestimonials": {
-    "ride": {
-      "name": "Julio",
-      "age": "22 años",
-      "text": "Tomebambike cambió mi forma de vivir Cuenca; ahora pedaleo cada mes con nuevos amigos."
-    },
     "learn": {
+      "name": "María Piedad",
+      "age": "27 años",
+      "text": "Antes de venir al taller tenía mucho miedo: pánico a los carros y poca confianza en mi equilibrio. Hoy es todo lo contrario. Me encantó el taller; pedalear junto a la orilla del río y conectar con la naturaleza fue una experiencia increíble. Recuperé la confianza."
+    },
+    "ride": {
       "name": "Daniela",
       "age": "24 años",
       "text": "Los talleres me dieron la confianza para salir en bici sin miedo."
@@ -75,7 +76,7 @@
     "km": "Kilómetros recorridos",
     "speakers": "Expositores"
   },
-  "common": {
+  "common_1": {
     "join": "¡Únete al cambio!"
   },
   "team": {
@@ -98,6 +99,12 @@
         "bio": "Estudiante de Estudios Internacionales. Comprometida con el impacto socioambiental y proyectos que transforman comunidades."
       }
     }
+  },
+  "alliances": {
+    "title": "NUESTRAS ALIANZAS",
+    "primary": "ALIADOS PRINCIPALES",
+    "institutions": "INSTITUCIONES COLABORADORAS",
+    "sponsors": "AUSPICIANTES"
   },
   "volunteer": {
     "banner": {
@@ -177,5 +184,43 @@
     "gallery": {
       "title": "Juntos creamos los mejores recuerdos"
     }
-  }
+  },
+  "common": {
+      "loading": "Cargando…",
+      "error": "Ocurrió un error"
+    },
+    "cyclestacks": {
+      "brand": "CicloTeca",
+      "tagline": "Biblioteca ciclista abierta por y para la comunidad",
+      "home": "Inicio",
+      "contribute": "Sugerir libro",
+      "clear": "Limpiar",
+      "searchLabel": "Buscar por título o autor",
+      "searchPh": "Escribe un título o autor…",
+      "searchAria": "Buscar libros",
+      "empty": "Aún no hay libros. ¡Sé el primero en sugerir uno!",
+      "footer": "Hecho con ♥ desde Tomebambike — {{brand}}",
+      "author": "Autor",
+      "year": "Año",
+      "download": "Descargar",
+      "openNew": "Abrir en pestaña",
+      "suggestRelated": "Sugerir relacionados",
+      "maybe": "También podría interesarte",
+      "noSuggestions": "Sin sugerencias por ahora",
+      "missing": "No encontramos este libro.",
+      "back": "Volver",
+      "mail": {
+        "subject": "Sugerencia de libro para CycleStacks",
+        "hi": "Hola Tomebambike,",
+        "propose": "Quisiera proponer un libro para la Cicloteca:",
+        "title": "• Título:",
+        "author": "• Autor:",
+        "year": "• Año:",
+        "desc": "• Descripción breve:",
+        "link": "• Enlace al archivo o ficha:",
+        "license": "• Licencia/permiso (si aplica):",
+        "contact": "• Mi contacto:",
+        "related": "Quiero sugerir libros relacionados con: {{title}}"
+      }
+    }
 }

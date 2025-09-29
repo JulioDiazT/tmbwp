@@ -5,9 +5,10 @@ import { useTranslation } from 'react-i18next'
 import logoRojo from '../assets/logorojo.png'
 
 const navItems = [
-  { path: '/eventos',    labelKey: 'nav.events'   },
   { path: '/recuerdos',  labelKey: 'nav.memories' },
-  { path: '/voluntariado', labelKey: 'nav.volunteer' }
+  { path: '/voluntariado', labelKey: 'nav.volunteer' },
+    { path: '/CycleStacks',    labelKey: 'nav.CycleStacks'   },
+
 ] as const
 
 export default function Header() {

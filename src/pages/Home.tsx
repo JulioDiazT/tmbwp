@@ -1,22 +1,22 @@
 import HeroCarousel from '../components/HeroCarousel'
 import ImpactMetrics from '../components/ImpactMetrics'
-import Footer from '../components/Footer'
 import AboutUsSection from '../components/AboutUsSection'
 import TeamSection from '../components/TeamSection'
 import ThreeLines from '../components/ThreeLines'
-import Phrase from '../components/Phrase'
+import PhraseWhoWeAre from '../components/PhraseWhoWeAre'
+import AlliancesLogos from '../components/AlliancesLogos'
 
 export default function Home() {
   return (
     <>
       <HeroCarousel />
       <ThreeLines/>
-      <Phrase/>
+      <PhraseWhoWeAre/>
       <AboutUsSection />
-
       <ImpactMetrics />
       <TeamSection />
-      <Footer />
+      <AlliancesLogos/>
+  
     </>
   )
 }

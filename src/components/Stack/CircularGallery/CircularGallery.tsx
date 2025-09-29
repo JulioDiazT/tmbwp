@@ -649,11 +649,11 @@ interface CircularGalleryProps {
 
 export default function CircularGallery({
   items,
-  bend = 3,
-  textColor = "#ffffff",
+  bend = 5,
+  textColor = "#302626ff",
   borderRadius = 0.05,
   font = "bold 30px Figtree",
-  scrollSpeed = 2,
+  scrollSpeed = 0.5,
   scrollEase = 0.05,
 }: CircularGalleryProps) {
   const containerRef = useRef<HTMLDivElement>(null);
