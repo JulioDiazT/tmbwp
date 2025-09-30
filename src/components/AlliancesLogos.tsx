@@ -13,7 +13,7 @@ import AmaruLogo from "../assets/AMARU.svg";
 import MunchiesLogo from "../assets/MUNCHIES.svg";
 import BHLogo from "../assets/BH.svg";
 import GIB from "../assets/GIB.svg";
-import CUENCA from "../assets/CUENCA.svg";
+import CUENCA from "../assets/cuenca.svg";
 import HUASIPICHANGA from "../assets/HUASIPICHANGA.svg";
 import INTEGRAR from "../assets/INTEGRAR.svg";
 import PROCREDIT from "../assets/PROCREDIT.svg";
