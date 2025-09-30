@@ -5,9 +5,9 @@ import clsx from 'clsx'
 import { useTranslation } from 'react-i18next'
 import { UserRound } from 'lucide-react'
 
-import adrianImg from '../assets/adri.png'
-import julioImg   from '../assets/julio.png'
-import danielaImg from '../assets/dani.png'
+import adrianImg from '../assets/adri.svg'
+import julioImg   from '../assets/julio.svg'
+import danielaImg from '../assets/dani.svg'
 
 type Member = {
   key: string                  // clave i18n: team.members.<key>.*

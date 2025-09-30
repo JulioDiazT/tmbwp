@@ -3,10 +3,10 @@ import { useTranslation } from "react-i18next";
 import { motion, AnimatePresence } from "framer-motion";
 
 // Imágenes demo (reemplaza por las tuyas)
-import slide1 from "../assets/1.png";
-import slide2 from "../assets/2.png";
-import slide3 from "../assets/3.png";
-import slide4 from "../assets/slide4.png";
+import slide1 from "../assets/1.svg";
+import slide2 from "../assets/2.svg";
+import slide3 from "../assets/3.svg";
+import slide4 from "../assets/slide4.svg";
 
 type MomentItem = {
   id: string;

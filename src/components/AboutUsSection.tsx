@@ -1,18 +1,19 @@
-// src/components/AboutUsSection.tsx
-import { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { useTranslation } from 'react-i18next';
+import { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { useTranslation } from "react-i18next";
 
 // Imágenes de categoría (lado derecho cuando no hay testimonio)
-import t1 from '../assets/t1.png';
-import t2 from '../assets/t2.png';
-import t3 from '../assets/t3.png';
+import t1 from "../assets/t1.svg";
+import t2 from "../assets/t2.svg";
+import t3 from "../assets/t3.svg";
 
 // Avatares de testimonios
-import pia from '../assets/pia.png';
-import adrian from '../assets/adri.png';
+import pia from "../assets/pia.svg";
+import adrian from "../assets/adri.svg";
+import mateo from "../assets/mateo.svg";
 
-type CategoryKey = 'ride' | 'learn' | 'change';
+
+type CategoryKey = "ride" | "learn" | "change";
 
 type Category = {
   key: CategoryKey;
@@ -22,9 +23,9 @@ type Category = {
 };
 
 const CATEGORIES: Category[] = [
-  { key: 'ride',   color: '#D2042D', categoryImg: t1, testimonialImg: pia     },
-  { key: 'learn',  color: '#0075FF', categoryImg: t2, testimonialImg: pia },
-  { key: 'change', color: '#6EB44E', categoryImg: t3, testimonialImg: adrian  },
+  { key: "ride", color: "#D2042D", categoryImg: t1, testimonialImg: mateo },
+  { key: "learn", color: "#0075FF", categoryImg: t2, testimonialImg: pia },
+  { key: "change", color: "#6EB44E", categoryImg: t3, testimonialImg: adrian },
 ];
 
 export default function AboutUsSection() {
@@ -33,7 +34,7 @@ export default function AboutUsSection() {
 
   return (
     <section id="about" className="bg-white w-screen overflow-hidden">
-      {/* TÍTULO PRINCIPAL (MUY GRANDE) */}
+      {/* TÍTULO PRINCIPAL */}
       <div className="w-screen px-4 sm:px-6 lg:px-8 pt-6 pb-2">
         <h2
           className="
@@ -42,7 +43,7 @@ export default function AboutUsSection() {
             text-5xl sm:text-6xl md:text-7xl lg:text-8xl
           "
         >
-          {t('about.inviteTitle')}
+          {t("about.inviteTitle")}
         </h2>
       </div>
 
@@ -52,14 +53,14 @@ export default function AboutUsSection() {
         return (
           <motion.div
             key={cat.key}
-            className="relative w-screen overflow-hidden lg:h-[75vh]" // alto consistente en desktop
+            className="relative w-screen overflow-hidden lg:h-[75vh]"
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 30 }}
             viewport={{ once: false, amount: 0.3 }}
-            transition={{ duration: 0.6, ease: 'easeInOut' }}
+            transition={{ duration: 0.6, ease: "easeInOut" }}
           >
-            {/* COLUMNA IZQUIERDA: título, texto y botón (limitado a container) */}
+            {/* Columna izquierda */}
             <div className="relative z-10 max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8 py-6 lg:py-10">
               <div className="lg:w-1/2">
                 <h3
@@ -91,23 +92,23 @@ export default function AboutUsSection() {
                   "
                   style={
                     isOpen
-                      ? { backgroundColor: cat.color, color: '#fff', borderColor: cat.color }
-                      : { backgroundColor: 'transparent', color: cat.color, borderColor: cat.color }
+                      ? { backgroundColor: cat.color, color: "#fff", borderColor: cat.color }
+                      : { backgroundColor: "transparent", color: cat.color, borderColor: cat.color }
                   }
                 >
-                  {isOpen ? t('about.testimonials.hide') : t('about.testimonials.show')}
+                  {isOpen ? t("about.testimonials.hide") : t("about.testimonials.show")}
                 </button>
               </div>
             </div>
 
-            {/* COLUMNA DERECHA: imagen full-bleed o tarjeta de testimonio */}
+            {/* Columna derecha */}
             <div
               className={`
                 block w-screen
                 lg:absolute lg:inset-y-0 lg:right-0 lg:w-1/2
                 flex justify-center items-start
                 px-0
-                ${isOpen ? 'pt-6 lg:pt-10' : 'pt-0'}   /* sin padding cuando hay imagen */
+                ${isOpen ? "pt-6 lg:pt-10" : "pt-0"}
                 h-full
               `}
             >
@@ -124,9 +125,8 @@ export default function AboutUsSection() {
                     initial={{ opacity: 0, scale: 0.95 }}
                     animate={{ opacity: 1, scale: 1 }}
                     exit={{ opacity: 0, scale: 0.95 }}
-                    transition={{ duration: 0.35, ease: 'easeInOut' }}
+                    transition={{ duration: 0.35, ease: "easeInOut" }}
                   >
-                    {/* Avatar más grande y centrado */}
                     <div
                       className="
                         mx-auto mb-5
@@ -137,8 +137,10 @@ export default function AboutUsSection() {
                     >
                       <img
                         src={cat.testimonialImg}
-                        alt={t(`aboutTestimonials.${cat.key}.name`) as string}
+                        alt={(t(`aboutTestimonials.${cat.key}.name`) as string) || ""}
                         className="w-full h-full object-cover"
+                        loading="lazy"
+                        decoding="async"
                       />
                     </div>
 
@@ -154,16 +156,18 @@ export default function AboutUsSection() {
                   <motion.img
                     key="categoryImg"
                     src={cat.categoryImg}
-                    alt={t(`about.cards.${cat.key}.title`) as string}
+                    alt={(t(`about.cards.${cat.key}.title`) as string) || ""}
                     className="
                       block w-screen lg:w-full
-                      h-64 sm:h-80 md:h-96 lg:h-full    /* llena la altura de la fila */
+                      h-64 sm:h-80 md:h-96 lg:h-full
                       object-cover
                     "
+                    loading="lazy"
+                    decoding="async"
                     initial={{ opacity: 0, x: 50 }}
                     animate={{ opacity: 1, x: 0 }}
                     exit={{ opacity: 0, x: 50 }}
-                    transition={{ duration: 0.5, ease: 'easeInOut' }}
+                    transition={{ duration: 0.5, ease: "easeInOut" }}
                   />
                 )}
               </AnimatePresence>

@@ -4,10 +4,10 @@ import { motion, Variants } from 'framer-motion'
 import { useInView } from 'react-intersection-observer'
 import { useTranslation } from 'react-i18next'
 
-import designerImg     from '../assets/v2.png'
-import commsImg        from '../assets/v3.png'
-import architectImg    from '../assets/v4.png'
-import sociologistImg  from '../assets/v1.png'
+import designerImg     from '../assets/v2.svg'
+import commsImg        from '../assets/v3.svg'
+import architectImg    from '../assets/v4.svg'
+import sociologistImg  from '../assets/v1.svg'
 
 const POSITIONS = [
   { key: 'designer',    img: designerImg    },

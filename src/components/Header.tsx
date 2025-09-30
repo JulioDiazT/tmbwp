@@ -1,14 +1,15 @@
+// src/components/Header.tsx
 import { useState } from 'react'
 import { Link, NavLink } from 'react-router-dom'
 import { Menu } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
-import logoRojo from '../assets/logorojo.png'
+
+import Logo from '../assets/logorojo.svg?url'
 
 const navItems = [
-  { path: '/recuerdos',  labelKey: 'nav.memories' },
+  { path: '/recuerdos', labelKey: 'nav.memories' },
   { path: '/voluntariado', labelKey: 'nav.volunteer' },
-    { path: '/CycleStacks',    labelKey: 'nav.CycleStacks'   },
-
+  { path: '/CycleStacks', labelKey: 'nav.CycleStacks' },
 ] as const
 
 export default function Header() {
@@ -25,12 +26,20 @@ export default function Header() {
      ${isActive ? 'text-primary' : 'text-neutral-900 hover:text-primary'}`
 
   return (
-    <header className="sticky top-0 z-50 rounded-b-2xl bg-white/95 shadow-md">
-      <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 md:py-4">
-        {/* Logo */}
-        <Link to="/" className="flex items-center gap-3">
-          <img src={logoRojo} alt="Tomebambike" className="h-10 w-auto md:h-14" />
-        </Link>
+<header className="sticky top-0 z-50 rounded-b-2xl bg-white/95 shadow-md">
+  <div className="mx-auto flex max-w-7xl items-center justify-between px-2 ">
+    <Link to="/" className="flex items-center gap-3" aria-label="Tomebambike - Inicio">
+      <img
+        src={Logo}
+        alt="Tomebambike"
+        className="
+          h-14 sm:h-16 md:h-20 lg:h-24
+          w-auto
+        "
+        decoding="async"
+        loading="eager"
+      />
+    </Link>
 
         {/* Móvil: idioma + hamburguesa */}
         <div className="flex items-center md:hidden">
@@ -58,11 +67,7 @@ export default function Header() {
           <ul className="flex flex-col gap-4 md:flex-row md:gap-10">
             {navItems.map(({ path, labelKey }) => (
               <li key={path}>
-                <NavLink
-                  to={path}
-                  onClick={() => setOpen(false)}
-                  className={navLinkClass}
-                >
+                <NavLink to={path} onClick={() => setOpen(false)} className={navLinkClass}>
                   {t(labelKey)}
                 </NavLink>
               </li>

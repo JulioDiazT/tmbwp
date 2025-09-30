@@ -1,6 +1,6 @@
 // src/components/BannerMemories.tsx
 import React, { FC, useEffect, useMemo, useRef, useState } from 'react';
-import heroImg from '../assets/banner-recuerdos.jpg';
+import heroImg from '../assets/banner-recuerdos.svg';
 import { useTranslation } from 'react-i18next';
 
 // Respeta reduced motion (RRM)

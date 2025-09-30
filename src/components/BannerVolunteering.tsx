@@ -2,7 +2,7 @@
 import { FC, useRef } from 'react'
 import { motion, useInView, Variants } from 'framer-motion'
 import { useTranslation } from 'react-i18next'
-import bannerImg from '../assets/vbanner.png'
+import bannerImg from '../assets/vbanner.svg'
 
 const container: Variants = {
   hidden: { opacity: 0, y: 40 },
