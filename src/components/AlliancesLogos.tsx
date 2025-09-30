@@ -6,17 +6,17 @@ import { useTranslation } from "react-i18next";
 
 import CBTLogoUrl         from "../assets/CBT.png";
 import UDALogoUrl         from "../assets/uda.png";
-import UCuencaLogoUrl     from "../assets/UCUENCA.png";
+import UCuencaLogoUrl     from "../assets/ucuenca.png";
 import S2CitiesLogoUrl    from "../assets/S2C.png";
-import AmaruLogoUrl       from "../assets/AMARU.png";
-import MunchiesLogoUrl    from "../assets/MUNCHIES.png";
+import AmaruLogoUrl       from "../assets/Amaru.png";
+import MunchiesLogoUrl    from "../assets/munchies.png";
 import BHLogoUrl          from "../assets/BH.png";
 import GIBUrl             from "../assets/GIB.png";
-import CUENCAUrl          from "../assets/CUENCA.png";
+import CUENCAUrl          from "../assets/Cuenca.png";
 import HUASIPICHANGAUrl   from "../assets/huasi.png";
-import INTEGRARUrl        from "../assets/INTEGRAR.png";
+import INTEGRARUrl        from "../assets/integrar.png";
 import PROCREDITUrl       from "../assets/BP.png";
-import EMOVUrl            from "../assets/EMOV.png";
+import EMOVUrl            from "../assets/emov.png";
 import AFUrl              from "../assets/AF.png";
 
 gsap.registerPlugin(ScrollTrigger);
