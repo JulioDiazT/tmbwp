@@ -1,4 +1,4 @@
-import React, { FC, useEffect, useMemo, useRef, useState } from "react";
+import { FC, useEffect, useMemo, useRef, useState } from "react";
 import heroImg from "../assets/banner-recuerdos.svg";
 import { useTranslation } from "react-i18next";
 
