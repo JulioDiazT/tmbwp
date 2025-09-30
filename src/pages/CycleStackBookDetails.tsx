@@ -1,4 +1,3 @@
-// File: src/pages/CycleStackBookDetails.tsx
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
@@ -34,24 +33,46 @@ function pickCoverClass(id: string) {
   return COVER_CLASSES[h % COVER_CLASSES.length];
 }
 
-// --- helpers de descarga robusta ---
+/* ---------------- utilidades robustas ---------------- */
+
+function timeout<T>(p: Promise<T>, ms: number, tag = "op"): Promise<T> {
+  return new Promise((resolve, reject) => {
+    const t = setTimeout(() => reject(new Error(`${tag}-timeout-${ms}ms`)), ms);
+    p.then(v => { clearTimeout(t); resolve(v); }, e => { clearTimeout(t); reject(e); });
+  });
+}
+
+// reintento con backoff, cada intento con timeout duro
+async function resolveRef(refLike: unknown): Promise<string | undefined> {
+  const tries = [
+    () => timeout(resolveFast(refLike), 1200, "fast"),
+    () => timeout(resolveInBackground(refLike), 2000, "bg1"),
+    () => timeout(resolveInBackground(refLike), 3000, "bg2"),
+  ];
+  for (const run of tries) {
+    try {
+      const url = await run();
+      if (url) return url;
+    } catch (e) {
+      // consola silenciosa para diagnóstico sin romper UI
+      console.debug("[resolveRef]", e);
+    }
+  }
+  return undefined;
+}
+
 async function robustDownload(url: string, fallbackName: string) {
-  // 1) intenta <a download>, que en la mayoría funciona (Chrome/Edge/Firefox)
   try {
     const a = document.createElement("a");
     a.href = url;
     a.download = guessFileName(url, fallbackName);
     a.rel = "noopener";
     a.target = "_blank";
-    // Inyecta y dispara
     document.body.appendChild(a);
     a.click();
     a.remove();
-    // En Safari iOS puede abrir nueva pestaña en vez de descargar; dejamos seguir.
     return;
-  } catch { /* sigue al blob */ }
-
-  // 2) fetch → blob → ObjectURL (mejor para Safari/iOS y algunos cross-origin)
+  } catch {}
   try {
     const res = await fetch(url, { mode: "cors", credentials: "omit", cache: "no-store" });
     if (!res.ok) throw new Error(String(res.status));
@@ -66,27 +87,30 @@ async function robustDownload(url: string, fallbackName: string) {
     a.remove();
     URL.revokeObjectURL(objectUrl);
   } catch {
-    // 3) último recurso: abrir en pestaña
     window.open(url, "_blank", "noopener,noreferrer");
   }
 }
 
-// Reintento exponencial suave (hasta ~18s total)
-async function resolveWithRetry(refLike: unknown, fastFirst = true): Promise<string | undefined> {
-  const tryOnce = () => (fastFirst ? resolveFast(refLike) : resolveInBackground(refLike));
-  const altOnce = () => (fastFirst ? resolveInBackground(refLike) : resolveFast(refLike));
+function prefetchFile(url: string) {
+  try {
+    const u = new URL(url);
+    const pre = document.createElement("link");
+    pre.rel = "preconnect";
+    pre.href = `${u.protocol}//${u.host}`;
+    pre.crossOrigin = "anonymous";
+    document.head.appendChild(pre);
 
-  let url = await tryOnce();
-  if (url) return url;
-
-  const sleeps = [400, 800, 1600, 3200, 6400]; // ms
-  for (let i = 0; i < sleeps.length; i++) {
-    await new Promise(r => setTimeout(r, sleeps[i]));
-    url = await altOnce();
-    if (url) return url;
-  }
-  return undefined;
+    const pf = document.createElement("link");
+    pf.rel = "prefetch";
+    // @ts-ignore
+    pf.as = "fetch";
+    pf.href = url;
+    pf.crossOrigin = "anonymous";
+    document.head.appendChild(pf);
+  } catch {}
 }
+
+/* ---------------- componente ---------------- */
 
 export default function CycleStackBookDetails() {
   const { t } = useTranslation();
@@ -105,53 +129,87 @@ export default function CycleStackBookDetails() {
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const mounted = useRef(true);
+  const [slow, setSlow] = useState(false);
 
-  useEffect(() => {
-    mounted.current = true;
-    return () => { mounted.current = false; };
-  }, []);
+  const alive = useRef(true);
+  useEffect(() => { alive.current = true; return () => { alive.current = false; }; }, []);
 
-  // Carga + resolución con retry
+  // marcador de operación lenta (UX)
   useEffect(() => {
-    let alive = true;
-    const doWork = async () => {
+    const t = setTimeout(() => setSlow(true), 6000);
+    return () => clearTimeout(t);
+  }, [id]);
+
+  // 1) lee el doc y PINTA de inmediato; 2) resuelve URLs en background
+  useEffect(() => {
+    let cancelled = false;
+
+    (async () => {
       try {
-        if (!id) throw new Error("Sin :id");
-        const snap = await getDoc(doc(db, "books", id));
-        if (!alive) return;
+        if (!id) throw new Error("missing-id");
+        setLoading(true);
+        setError(null);
 
-        if (!snap.exists()) { setState(null); setLoading(false); return; }
+        const snap = await timeout(getDoc(doc(db, "books", id)), 4000, "getDoc");
+        if (cancelled) return;
+
+        if (!snap.exists()) {
+          setState(null);
+          setLoading(false);
+          return;
+        }
 
         const v = snap.data() as DocumentData as BookDoc;
         const title = String(v.title ?? v.name ?? "");
         const author = String(v.author ?? v.autor ?? "");
         const year = v.year ?? "";
         const description = String(v.description ?? "");
-        const cover = v.cover;
-        const fileRef = v.fileUrl ?? v.doc;
 
+        // Pinta YA, sin URLs
+        setState({ id, title, author, year, description });
+        setLoading(false);
+
+        // Resuelve URLs en segundo plano
         const [coverUrl, fileUrlResolved] = await Promise.all([
-          resolveWithRetry(cover, true),
-          resolveWithRetry(fileRef, true),
+          resolveRef(v.cover),
+          resolveRef(v.fileUrl ?? v.doc),
         ]);
 
-        if (!alive) return;
-        setState({ id, title, author, year, description, coverUrl, fileUrlResolved });
-        setLoading(false);
-      } catch (e: any) {
-        if (alive) { setError(e?.message ?? "Error"); setLoading(false); }
-      }
-    };
+        if (cancelled || !alive.current) return;
 
-    setLoading(true);
-    doWork();
-    return () => { alive = false; };
+        setState(s => (s ? { ...s, coverUrl: coverUrl ?? s.coverUrl, fileUrlResolved: fileUrlResolved ?? s.fileUrlResolved } : s));
+
+        if (fileUrlResolved) prefetchFile(fileUrlResolved);
+      } catch (e: any) {
+        if (!cancelled) {
+          console.error("[BookDetails]", e);
+          setError(e?.message ?? "Error");
+          setLoading(false);
+        }
+      }
+    })();
+
+    return () => { cancelled = true; };
   }, [id]);
 
   const coverClass = useMemo(() => (state ? pickCoverClass(state.id) : COVER_CLASSES[0]), [state]);
+  const hasFile = Boolean(state?.fileUrlResolved);
 
-  // --- UI states ---
+  /* ---------------- UI states ---------------- */
+
+  if (!id) {
+    return (
+      <div className="mx-auto max-w-5xl p-6 font-quicksand">
+        <div className="rounded-md border border-gray-200 p-6 text-center">
+          <p className="mb-4 text-andesnavy">{t("cyclestacks.missing") || "No encontrado"}</p>
+          <button onClick={() => navigate(-1)} className="rounded-full bg-tmbred px-4 py-2 text-white hover:bg-tmbred/90">
+            {t("cyclestacks.back") || "Volver"}
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   if (error) {
     return (
       <div className="mx-auto max-w-5xl p-6 font-quicksand">
@@ -192,8 +250,6 @@ export default function CycleStackBookDetails() {
     );
   }
 
-  const hasFile = Boolean(state.fileUrlResolved);
-
   const openInNewTab = () => {
     if (state.fileUrlResolved) window.open(state.fileUrlResolved, "_blank", "noopener,noreferrer");
   };
@@ -201,17 +257,22 @@ export default function CycleStackBookDetails() {
   const onDownload = async () => {
     if (!state.fileUrlResolved) return;
     try {
-      // intenta tu util primero
       const name = guessFileName(state.fileUrlResolved, `${state.title}.pdf`);
       await downloadFile(state.fileUrlResolved, name);
     } catch {
-      // robust fallback
       await robustDownload(state.fileUrlResolved, `${state.title}.pdf`);
     }
   };
 
   return (
     <div className="mx-auto max-w-5xl p-4 md:p-6 font-quicksand">
+      {/* aviso opcional si tarda */}
+      {slow && !hasFile && (
+        <div className="mb-3 rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-[13px] text-amber-800">
+          {t("cyclestacks.loadingSlow") || "Estamos preparando el archivo… puedes seguir leyendo mientras tanto."}
+        </div>
+      )}
+
       {/* Breadcrumb */}
       <nav className="mb-4 text-sm" aria-label="breadcrumb">
         <Link to="/cicloteca" className="text-andesnavy hover:underline">
@@ -250,6 +311,7 @@ export default function CycleStackBookDetails() {
           <h1 className="mb-2 text-2xl md:text-4xl font-rubikOne uppercase tracking-wide text-andesnavy">
             {state.title}
           </h1>
+
           <p className="mb-4 text-sm text-andesnavy/90">
             <strong className="text-andesnavy">{t("cyclestacks.author") || "Autor"}:</strong> {state.author}
             &nbsp;·&nbsp;
