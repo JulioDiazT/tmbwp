@@ -7,9 +7,9 @@ import { useTranslation } from 'react-i18next'
 import Logo from '../assets/logorojo.svg?url'
 
 const navItems = [
-  { path: '/recuerdos', labelKey: 'nav.memories' },
+  { path: '/recuerdos',    labelKey: 'nav.memories' },
   { path: '/voluntariado', labelKey: 'nav.volunteer' },
-  { path: '/CycleStacks', labelKey: 'nav.CycleStacks' },
+  { path: '/cyclestacks',  labelKey: 'nav.CycleStacks' }, // ⬅️ minúsculas
 ] as const
 
 export default function Header() {
@@ -26,20 +26,23 @@ export default function Header() {
      ${isActive ? 'text-primary' : 'text-neutral-900 hover:text-primary'}`
 
   return (
-<header className="sticky top-0 z-50 rounded-b-2xl bg-white/95 shadow-md">
-  <div className="mx-auto flex max-w-7xl items-center justify-between px-2 ">
-    <Link to="/" className="flex items-center gap-3" aria-label="Tomebambike - Inicio">
-      <img
-        src={Logo}
-        alt="Tomebambike"
-        className="
-          h-14 sm:h-16 md:h-20 lg:h-24
-          w-auto
-        "
-        decoding="async"
-        loading="eager"
-      />
-    </Link>
+    <header className="sticky top-0 z-50 rounded-b-2xl bg-white/95 shadow-md">
+      <div className="mx-auto flex max-w-7xl items-center justify-between px-2 ">
+        {/* ⬇️ Asegura volver al home y cerrar menú en móvil */}
+        <Link
+          to="/"
+          onClick={() => setOpen(false)}
+          className="flex items-center gap-3"
+          aria-label="Tomebambike - Inicio"
+        >
+          <img
+            src={Logo}
+            alt="Tomebambike"
+            className="h-14 sm:h-16 md:h-20 lg:h-24 w-auto"
+            decoding="async"
+            loading="eager"
+          />
+        </Link>
 
         {/* Móvil: idioma + hamburguesa */}
         <div className="flex items-center md:hidden">
@@ -63,6 +66,7 @@ export default function Header() {
             md:static md:flex md:items-center md:gap-10 md:bg-transparent md:p-0
             ${open ? 'visible opacity-100' : 'invisible opacity-0 md:visible md:opacity-100'}
           `}
+          role="navigation"
         >
           <ul className="flex flex-col gap-4 md:flex-row md:gap-10">
             {navItems.map(({ path, labelKey }) => (

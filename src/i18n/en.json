@@ -7,8 +7,15 @@
     "join": "JOIN"
   },
   "footer": {
+    "tagline": "Healthier, safer and more inclusive cities — one pedal at a time.",
+    "quicklinks": "Quick links",
     "follow": "Follow us",
-    "rights": "All rights reserved"
+    "rights": "All rights reserved",
+    "privacyLink": "Privacy",
+    "termsLink": "Terms",
+    "ctaTitle": "Want to hear about our events?",
+    "ctaDesc": "Follow us on Instagram and turn on notifications. We post dates, routes and spots there.",
+    "ctaButton": "See upcoming events on Instagram"
   },
   "hero": {
     "title": "LET’S PEDAL TOGETHER WITH PURPOSE",

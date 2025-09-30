@@ -4,35 +4,45 @@
 @import url('https://fonts.googleapis.com/css2?family=Rubik+Mono+One&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Special+Gothic+Expanded+One&display=swap');
 
-/* 2) Luego tus directivas de Tailwind */
+/* Tailwind */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+/* scroll suave */
+html { scroll-behavior: smooth; }
+
 /* Utilidad para sombra de texto ligera */
 @layer utilities {
-  .text-shadow {
-    text-shadow: 0 1px 2px rgba(0,0,0,.25);
-  }
+  .text-shadow { text-shadow: 0 1px 2px rgba(0,0,0,.25); }
 }
-/* scroll suave */
-html {
-  scroll-behavior: smooth;
-}
-/* src/index.css */
 
+/* Highlights */
 @layer utilities {
-  
- 
   .highlight {
-    display: inline;                /* inline para respetar el flujo */
+    display: inline;
     box-decoration-break: clone;
     -webkit-box-decoration-break: clone;
-    padding: 0 0.125rem;            /* padding horizontal MUY pequeño */
-    border-radius: 0.25rem;         /* bordes redondeados */
+    padding: 0 0.125rem;
+    border-radius: 0.25rem;
   }
-  .highlight--green { background-color:  #8dc63f; color: #ffffff; }
+  .highlight--green  { background-color: #8dc63f; color: #ffffff; }
   .highlight--blue   { background-color: #1097f6; color: #ffffff; }
-  .highlight--yellow { background-color:  #ffde00; color: #ffffff; }
+  .highlight--yellow { background-color: #ffde00; color: #ffffff; }
+}
 
+/* ===== Nitidez SVG (aplica SOLO a SVG inline, no a <img>) ===== */
+@layer utilities {
+  /* Activa render geométrico y legibilidad de texto */
+  .svg-crisp {
+    shape-rendering: geometricPrecision;
+    text-rendering: optimizeLegibility;
+    /* evita subpíxeles post-animación */
+    backface-visibility: hidden;
+    transform: translateZ(0);
+  }
+  /* Mantiene grosor de trazos al escalar */
+  .svg-crisp * {
+    vector-effect: non-scaling-stroke;
+  }
 }

@@ -1,41 +1,39 @@
-import React, { useLayoutEffect, useRef } from 'react';
-import BannerMemories     from '../components/BannerMemories';
-import MemoriesGallery    from '../components/MemoriesGallery';
-import PedalsBlog from '../components/PedalsBlog';
+import React, { useLayoutEffect, useRef } from "react";
+import BannerMemories from "../components/BannerMemories";
+import HowItStarted from "../components/HowItStarted";
+import MemoriesGallery from "../components/MemoriesGallery";
+import MemoriesCTA from "../components/MemoriesCTA";
 
-// Hook mínimo para garantizar scroll-top al montar y foco accesible
-function useScrollTopOnMount(focusRef?: React.RefObject<HTMLElement>) {
+// scroll-top al entrar (con foco accesible opcional)
+function useScrollTopOnMount(focusRef?: React.RefObject<HTMLElement | null>) {
   useLayoutEffect(() => {
-    // “auto” = instantáneo; evita scroll suave involuntario al entrar
-    window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
-    focusRef?.current?.focus?.();
+    window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+    const el = focusRef?.current;
+    if (el && typeof el.focus === "function") el.focus();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 }
 
-/** “Memories” – visual recollections hub */
-export const MemoriesPage = () => {
-  const mainRef = useRef<HTMLElement | null>(null); 
-  useScrollTopOnMount();
+const MemoriesPage: React.FC = () => {
+  // TIP: evita el error de tipos usando HTMLElement | null
+  const mainRef = useRef<HTMLElement | null>(null);
+  useScrollTopOnMount(mainRef);
 
   return (
     <>
-      {/* Hero banner (GSAP-pinned, con fallback RRM) */}
       <BannerMemories />
 
-      {/* Contenido principal navegable con teclado (skip-to-content friendly) */}
+      {/* Contenido principal navegable por teclado */}
       <main
         id="main-content"
         ref={mainRef}
         tabIndex={-1}
         className="outline-none"
-        aria-label="Contenido de recuerdos"
+        aria-label="Recuerdos"
       >
-        {/* Circular gallery */}
+        <HowItStarted />
         <MemoriesGallery />
-        <PedalsBlog/>
-
-   
-
+        <MemoriesCTA />
       </main>
     </>
   );

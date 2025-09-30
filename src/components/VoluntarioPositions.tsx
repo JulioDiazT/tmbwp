@@ -9,6 +9,8 @@ import commsImg        from '../assets/v3.svg'
 import architectImg    from '../assets/v4.svg'
 import sociologistImg  from '../assets/v1.svg'
 
+const APPLICATION_URL = 'https://forms.gle/Mqe39FNQYuGmMSDM8'
+
 const POSITIONS = [
   { key: 'designer',    img: designerImg    },
   { key: 'comms',       img: commsImg       },
@@ -28,7 +30,6 @@ const item: Variants = {
 
 export const VoluntarioPositions: FC = () => {
   const { t } = useTranslation()
-  // Usamos triggerOnce en lugar de once
   const { ref, inView } = useInView({ threshold: 0.3, triggerOnce: true })
 
   return (
@@ -70,7 +71,10 @@ export const VoluntarioPositions: FC = () => {
                 {t(`volunteer.positions.${key}.desc`)}
               </p>
               <a
-                href={t('volunteer.positions.ctaLink', '#')}
+                href={APPLICATION_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={t('volunteer.positions.cta')}
                 className="mt-auto inline-block text-sm font-semibold uppercase tracking-wide text-primary border-2 border-primary px-4 py-2 rounded-full transition-transform hover:scale-105 hover:bg-primary hover:text-white text-center"
               >
                 {t('volunteer.positions.cta')}

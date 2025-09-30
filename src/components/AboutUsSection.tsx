@@ -1,20 +1,18 @@
-import { useState } from "react";
+// src/components/AboutUsSection.tsx
+import { useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useTranslation } from "react-i18next";
+import { usePreloadOnIntersect } from "../hooks/usePreloadOnIntersect";
 
-// Imágenes de categoría (lado derecho cuando no hay testimonio)
+// Imágenes
 import t1 from "../assets/t1.svg";
 import t2 from "../assets/t2.svg";
 import t3 from "../assets/t3.svg";
-
-// Avatares de testimonios
 import pia from "../assets/pia.svg";
 import adrian from "../assets/adri.svg";
 import mateo from "../assets/mateo.svg";
 
-
 type CategoryKey = "ride" | "learn" | "change";
-
 type Category = {
   key: CategoryKey;
   color: string;
@@ -23,17 +21,35 @@ type Category = {
 };
 
 const CATEGORIES: Category[] = [
-  { key: "ride", color: "#D2042D", categoryImg: t1, testimonialImg: mateo },
-  { key: "learn", color: "#0075FF", categoryImg: t2, testimonialImg: pia },
-  { key: "change", color: "#6EB44E", categoryImg: t3, testimonialImg: adrian },
+  { key: "ride",   color: "#D2042D", categoryImg: t1, testimonialImg: mateo },
+  { key: "learn",  color: "#0075FF", categoryImg: t2, testimonialImg: pia   },
+  { key: "change", color: "#6EB44E", categoryImg: t3, testimonialImg: adrian},
 ];
 
 export default function AboutUsSection() {
   const { t } = useTranslation();
   const [active, setActive] = useState<CategoryKey | null>(null);
 
+  // Precarga anticipada de TODO lo que la sección va a necesitar
+  // (si quieres, puedes dividir por sub-sección para afinar).
+  const imagesToPreload = useMemo(
+    () => [
+      t1, t2, t3,
+      pia, adrian, mateo
+    ],
+    []
+  );
+  // El sentinela se pone ANTES del bloque visual (ver más abajo).
+  const preloadRef = usePreloadOnIntersect(imagesToPreload, {
+    rootMargin: "1200px 0px", // ~1.2 pantallas antes
+    once: true,
+  });
+
   return (
     <section id="about" className="bg-white w-screen overflow-hidden">
+      {/* SENTINELA: apenas el usuario se acerque, arrancamos precarga */}
+      <div ref={preloadRef} aria-hidden="true" />
+
       {/* TÍTULO PRINCIPAL */}
       <div className="w-screen px-4 sm:px-6 lg:px-8 pt-6 pb-2">
         <h2
@@ -139,6 +155,7 @@ export default function AboutUsSection() {
                         src={cat.testimonialImg}
                         alt={(t(`aboutTestimonials.${cat.key}.name`) as string) || ""}
                         className="w-full h-full object-cover"
+                        width={160} height={160}
                         loading="lazy"
                         decoding="async"
                       />
@@ -162,6 +179,7 @@ export default function AboutUsSection() {
                       h-64 sm:h-80 md:h-96 lg:h-full
                       object-cover
                     "
+                    width={1600} height={900}
                     loading="lazy"
                     decoding="async"
                     initial={{ opacity: 0, x: 50 }}

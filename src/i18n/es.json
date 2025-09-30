@@ -5,9 +5,16 @@
     "CycleStacks": "CICLOTECA",
     "join": "ÚNETE"
   },
-  "footer": {
+   "footer": {
+    "tagline": "Ciudades más sanas, seguras e inclusivas — un pedal a la vez.",
+    "quicklinks": "Enlaces rápidos",
     "follow": "Síguenos",
-    "rights": "Todos los derechos reservados"
+    "rights": "Todos los derechos reservados",
+    "privacyLink": "Privacidad",
+    "termsLink": "Términos",
+    "ctaTitle": "¿Quieres enterarte de nuestros eventos?",
+    "ctaDesc": "Síguenos en Instagram y activa las notificaciones. Allí publicamos fechas, rutas y cupos.",
+    "ctaButton": "Ver próximos eventos en Instagram"
   },
   "hero": {
     "title": "PEDALIEMOS JUNTOS CON PROPÓSITO",

@@ -1,5 +1,5 @@
 // File: src/pages/CycleStackBookDetails.tsx
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { db } from "../firebase";
@@ -12,9 +12,9 @@ type BookDoc = {
   author?: string; autor?: string;
   year?: number | string;
   description?: string;
-  cover?: unknown;   // string | Reference | StorageRef
-  fileUrl?: unknown; // string | Reference | StorageRef
-  doc?: unknown;     // compat
+  cover?: unknown;
+  fileUrl?: unknown;
+  doc?: unknown;
 };
 
 const COVER_CLASSES = [
@@ -27,10 +27,65 @@ const COVER_CLASSES = [
   "from-rose-400 to-red-600",
   "from-purple-400 to-indigo-600",
 ];
+
 function pickCoverClass(id: string) {
   let h = 0;
   for (let i = 0; i < id.length; i++) h = (h * 31 + id.charCodeAt(i)) >>> 0;
   return COVER_CLASSES[h % COVER_CLASSES.length];
+}
+
+// --- helpers de descarga robusta ---
+async function robustDownload(url: string, fallbackName: string) {
+  // 1) intenta <a download>, que en la mayoría funciona (Chrome/Edge/Firefox)
+  try {
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = guessFileName(url, fallbackName);
+    a.rel = "noopener";
+    a.target = "_blank";
+    // Inyecta y dispara
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    // En Safari iOS puede abrir nueva pestaña en vez de descargar; dejamos seguir.
+    return;
+  } catch { /* sigue al blob */ }
+
+  // 2) fetch → blob → ObjectURL (mejor para Safari/iOS y algunos cross-origin)
+  try {
+    const res = await fetch(url, { mode: "cors", credentials: "omit", cache: "no-store" });
+    if (!res.ok) throw new Error(String(res.status));
+    const blob = await res.blob();
+    const objectUrl = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = objectUrl;
+    a.download = guessFileName(url, fallbackName);
+    a.rel = "noopener";
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(objectUrl);
+  } catch {
+    // 3) último recurso: abrir en pestaña
+    window.open(url, "_blank", "noopener,noreferrer");
+  }
+}
+
+// Reintento exponencial suave (hasta ~18s total)
+async function resolveWithRetry(refLike: unknown, fastFirst = true): Promise<string | undefined> {
+  const tryOnce = () => (fastFirst ? resolveFast(refLike) : resolveInBackground(refLike));
+  const altOnce = () => (fastFirst ? resolveInBackground(refLike) : resolveFast(refLike));
+
+  let url = await tryOnce();
+  if (url) return url;
+
+  const sleeps = [400, 800, 1600, 3200, 6400]; // ms
+  for (let i = 0; i < sleeps.length; i++) {
+    await new Promise(r => setTimeout(r, sleeps[i]));
+    url = await altOnce();
+    if (url) return url;
+  }
+  return undefined;
 }
 
 export default function CycleStackBookDetails() {
@@ -42,22 +97,25 @@ export default function CycleStackBookDetails() {
     id: string;
     title: string;
     author: string;
-    year: number;
+    year: number | string;
     description: string;
     coverUrl?: string;
     fileUrlResolved?: string;
   } | null>(null);
 
   const [loading, setLoading] = useState(true);
-  const [late, setLate] = useState<{ coverUrl?: string; fileUrlResolved?: string }>({});
   const [error, setError] = useState<string | null>(null);
+  const mounted = useRef(true);
 
-  // Carga + resolución rápida (≤2.5s)
+  useEffect(() => {
+    mounted.current = true;
+    return () => { mounted.current = false; };
+  }, []);
+
+  // Carga + resolución con retry
   useEffect(() => {
     let alive = true;
-    const stopSpinner = setTimeout(() => { if (alive) setLoading(false); }, 2500);
-
-    (async () => {
+    const doWork = async () => {
       try {
         if (!id) throw new Error("Sin :id");
         const snap = await getDoc(doc(db, "books", id));
@@ -68,49 +126,32 @@ export default function CycleStackBookDetails() {
         const v = snap.data() as DocumentData as BookDoc;
         const title = String(v.title ?? v.name ?? "");
         const author = String(v.author ?? v.autor ?? "");
-        const year = Number(v.year ?? 0);
+        const year = v.year ?? "";
         const description = String(v.description ?? "");
         const cover = v.cover;
         const fileRef = v.fileUrl ?? v.doc;
 
         const [coverUrl, fileUrlResolved] = await Promise.all([
-          resolveFast(cover),
-          resolveFast(fileRef),
+          resolveWithRetry(cover, true),
+          resolveWithRetry(fileRef, true),
         ]);
 
         if (!alive) return;
-        setState({
-          id,
-          title,
-          author,
-          year,
-          description,
-          coverUrl,
-          fileUrlResolved,
-        });
+        setState({ id, title, author, year, description, coverUrl, fileUrlResolved });
         setLoading(false);
-
-        // SWR: si no hubo URL rápida, reintenta en segundo plano
-        if (!coverUrl && cover) resolveInBackground(cover).then(u => u && alive && setLate(s => ({ ...s, coverUrl: u })));
-        if (!fileUrlResolved && fileRef) resolveInBackground(fileRef).then(u => u && alive && setLate(s => ({ ...s, fileUrlResolved: u })));
       } catch (e: any) {
-        if (alive) { setError(e.message ?? "Error"); setLoading(false); }
+        if (alive) { setError(e?.message ?? "Error"); setLoading(false); }
       }
-    })();
+    };
 
-    return () => { alive = false; clearTimeout(stopSpinner); };
+    setLoading(true);
+    doWork();
+    return () => { alive = false; };
   }, [id]);
-
-  // Actualiza cuando llegan URLs en segundo plano
-  useEffect(() => {
-    if (!state) return;
-    if (late.coverUrl || late.fileUrlResolved) {
-      setState({ ...state, coverUrl: late.coverUrl ?? state.coverUrl, fileUrlResolved: late.fileUrlResolved ?? state.fileUrlResolved });
-    }
-  }, [late]); // eslint-disable-line
 
   const coverClass = useMemo(() => (state ? pickCoverClass(state.id) : COVER_CLASSES[0]), [state]);
 
+  // --- UI states ---
   if (error) {
     return (
       <div className="mx-auto max-w-5xl p-6 font-quicksand">
@@ -122,7 +163,6 @@ export default function CycleStackBookDetails() {
   }
 
   if (loading && !state) {
-    // Skeleton (≤2.5s)
     return (
       <div className="mx-auto max-w-5xl p-6 font-quicksand animate-pulse">
         <div className="h-6 w-40 bg-gray-200 rounded mb-4" />
@@ -152,6 +192,8 @@ export default function CycleStackBookDetails() {
     );
   }
 
+  const hasFile = Boolean(state.fileUrlResolved);
+
   const openInNewTab = () => {
     if (state.fileUrlResolved) window.open(state.fileUrlResolved, "_blank", "noopener,noreferrer");
   };
@@ -159,11 +201,12 @@ export default function CycleStackBookDetails() {
   const onDownload = async () => {
     if (!state.fileUrlResolved) return;
     try {
+      // intenta tu util primero
       const name = guessFileName(state.fileUrlResolved, `${state.title}.pdf`);
       await downloadFile(state.fileUrlResolved, name);
     } catch {
-      // fallback: si algo falla, abre en pestaña
-      window.open(state.fileUrlResolved, "_blank", "noopener,noreferrer");
+      // robust fallback
+      await robustDownload(state.fileUrlResolved, `${state.title}.pdf`);
     }
   };
 
@@ -171,7 +214,7 @@ export default function CycleStackBookDetails() {
     <div className="mx-auto max-w-5xl p-4 md:p-6 font-quicksand">
       {/* Breadcrumb */}
       <nav className="mb-4 text-sm" aria-label="breadcrumb">
-        <Link to="/cyclestacks" className="text-andesnavy hover:underline">
+        <Link to="/cicloteca" className="text-andesnavy hover:underline">
           {t("cyclestacks.brand") || "CicloTeca"}
         </Link>
         <span className="mx-2 text-gray-400">/</span>
@@ -179,20 +222,24 @@ export default function CycleStackBookDetails() {
       </nav>
 
       <div className="grid grid-cols-1 gap-6 md:grid-cols-5">
-        {/* PORTADA -> SIEMPRE COVER CON TÍTULO Y FONDO DE COLOR */}
+        {/* COVER clickable */}
         <div className="md:col-span-2">
           <div
-            role="button"
+            role={hasFile ? "button" : "img"}
             onClick={openInNewTab}
-            title={state.fileUrlResolved ? "Abrir en nueva pestaña" : "Archivo no disponible"}
-            className={`group relative h-64 rounded-xl overflow-hidden cursor-pointer select-none bg-gradient-to-br ${coverClass} flex items-center justify-center text-white ring-1 ring-gray-200`}
+            title={
+              hasFile
+                ? (t("cyclestacks.openHint") as string) || "Abrir en nueva pestaña"
+                : (t("cyclestacks.fileMissing") as string) || "Archivo no disponible"
+            }
+            className={`group relative h-64 rounded-xl overflow-hidden ${hasFile ? "cursor-pointer" : "cursor-default"} select-none bg-gradient-to-br ${coverClass} flex items-center justify-center text-white ring-1 ring-gray-200`}
           >
             <span className="mx-6 text-center text-base font-semibold drop-shadow-sm transition-transform duration-300 group-hover:scale-[1.02]">
               {state.title}
             </span>
-            {state.fileUrlResolved && (
+            {hasFile && (
               <div className="pointer-events-none absolute bottom-2 right-2 rounded-full bg-white/90 px-3 py-1 text-xs font-medium text-andesnavy shadow-sm">
-                Click para abrir
+                {t("cyclestacks.clickToOpen") || "Click para abrir"}
               </div>
             )}
           </div>
@@ -206,13 +253,13 @@ export default function CycleStackBookDetails() {
           <p className="mb-4 text-sm text-andesnavy/90">
             <strong className="text-andesnavy">{t("cyclestacks.author") || "Autor"}:</strong> {state.author}
             &nbsp;·&nbsp;
-            <strong className="text-andesnavy">{t("cyclestacks.year") || "Año"}:</strong> {state.year}
+            <strong className="text-andesnavy">{t("cyclestacks.year") || "Año"}:</strong> {state.year as any}
           </p>
 
           <p className="mb-6 text-andesnavy leading-relaxed whitespace-pre-line">{state.description}</p>
 
           <div className="flex flex-wrap gap-3">
-            {state.fileUrlResolved ? (
+            {hasFile ? (
               <>
                 <button
                   onClick={onDownload}
@@ -220,17 +267,20 @@ export default function CycleStackBookDetails() {
                 >
                   {t("cyclestacks.download") || "Descargar"}
                 </button>
+
                 <a
                   href={state.fileUrlResolved}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="rounded-full border border-gray-300 bg-white px-5 py-2.5 text-sm font-semibold text-andesnavy hover:bg-gray-50"
                 >
-                  {t("cyclestacks.openNew") || "Abrir en pestaña"}
+                  {t("cyclestacks.openNew") || "Ver online"}
                 </a>
               </>
             ) : (
-              <span className="text-sm text-andesnavy/70">Archivo no disponible</span>
+              <span className="text-sm text-andesnavy/70">
+                {t("cyclestacks.fileMissing") || "Archivo no disponible"}
+              </span>
             )}
           </div>
         </div>

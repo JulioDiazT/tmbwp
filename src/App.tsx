@@ -10,9 +10,15 @@ import MemoriesPage from "./pages/Memories";
 import CycleStackBookDetails from "./pages/CycleStackBookDetails";
 import CycleStackContribute from "./pages/CycleStackContribute";
 
+// ⬇️ importa el helper
+import ScrollToTop from "./components/ScrollToTop";
+
 export default function App() {
   return (
     <BrowserRouter>
+      {/* ⬇️ colócalo aquí, una sola vez */}
+      <ScrollToTop />
+
       <Header />
 
       <Routes>
