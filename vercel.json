@@ -1,7 +1,15 @@
 {
   "redirects": [
     {
+      "source": "https://*.vercel.app/(.*)",
+      "destination": "https://tomebambike.com/$1",
+      "permanent": true
+    },
+    {
       "source": "/(.*)",
+      "has": [
+        { "type": "host", "value": "www.tomebambike.com" }
+      ],
       "destination": "https://tomebambike.com/$1",
       "permanent": true
     }
