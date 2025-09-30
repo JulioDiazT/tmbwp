@@ -5,7 +5,7 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useTranslation } from "react-i18next";
 
 import CBTLogoUrl         from "../assets/CBT.png";
-import UDALogoUrl         from "../assets/UDA.png";
+import UDALogoUrl         from "../assets/uda.png";
 import UCuencaLogoUrl     from "../assets/UCUENCA.png";
 import S2CitiesLogoUrl    from "../assets/S2C.png";
 import AmaruLogoUrl       from "../assets/AMARU.png";
