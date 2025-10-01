@@ -1,87 +1,138 @@
 // src/components/TeamSection.tsx
-import { FC } from 'react'
-import { motion } from 'framer-motion'
-import clsx from 'clsx'
-import { useTranslation } from 'react-i18next'
-import { UserRound } from 'lucide-react'
+import { FC } from "react";
+import { motion } from "framer-motion";
+import { useTranslation } from "react-i18next";
+import { ArrowUpRight } from "lucide-react";
 
-import adrianImg from '../assets/adri.svg'
-import julioImg   from '../assets/julio.svg'
-import danielaImg from '../assets/dani.svg'
+import adrianImg from "../assets/adri.svg";
+import julioImg from "../assets/julio.svg";
+import danielaImg from "../assets/dani.svg";
 
 type Member = {
-  key: string                  // clave i18n: team.members.<key>.*
-  color: string                // Color dinámico para el “ring”
-  img: string                  // Foto de perfil
-}
+  key: string;      // i18n: team.members.<key>.*
+  img: string;
+  age: number;      // chip (se mantiene)
+  songUrl?: string; // link a Spotify
+  theme: string;    // #9958fd | #d6ef0a | #fe8303 (acento)
+};
 
 const MEMBERS: Member[] = [
-  { key: 'adrian',  color: '#D2042D', img: adrianImg  },
-  { key: 'julio',   color: '#0075FF', img: julioImg   },
-  { key: 'daniela', color: '#7A9B52', img: danielaImg },
-]
+  {
+    key: "adrian",
+    img: adrianImg,
+    age: 27,
+    songUrl:
+      "https://open.spotify.com/track/1myEOhXztRxUVfaAEQiKkU?si=CEHTnL1ORtOJJL-O7ezcGQ&context=spotify%3Asearch%3Aflorence",
+    theme: "#9958fd",
+  },
+  {
+    key: "julio",
+    img: julioImg,
+    age: 26,
+    songUrl:
+      "https://open.spotify.com/intl-es/track/3IQF4xCQUPicbA4hWfTxPo?si=e4d01eb269a74e60",
+    theme: "#d6ef0a",
+  },
+  {
+    key: "daniela",
+    img: danielaImg,
+    age: 25,
+    songUrl:
+      "https://open.spotify.com/track/0HGUJg63wQZIaaFY12rC5O?si=18Q1WUecRIuIVD3MAvj-vA",
+    theme: "#fe8303",
+  },
+];
+
+const SpotifyIcon: FC<{ className?: string }> = ({ className }) => (
+  <svg viewBox="0 0 24 24" className={className} aria-hidden="true">
+    <path
+      fill="currentColor"
+      d="M12 1.6a10.4 10.4 0 1 0 0 20.8A10.4 10.4 0 0 0 12 1.6zm5.03 15.31a.9.9 0 0 1-1.24.3c-3.41-2.08-7.7-2.55-12.75-1.39a.9.9 0 1 1-.41-1.76c5.46-1.25 10.17-.72 13.94 1.51a.9.9 0 0 1 .46 1.34zm1.6-3.28a1.06 1.06 0 0 1-1.45.35c-3.91-2.39-9.87-3.09-14.5-1.7a1.06 1.06 0 1 1-.61-2.02c5.18-1.55 11.73-.77 16.21 1.91.5.31.66.97.35 1.46zm.12-3.34C14.4 7.63 7.2 7.37 3.05 8.63a1.24 1.24 0 1 1-.73-2.37C7.06 4.72 15 5 20.05 8.04a1.24 1.24 0 1 1-1.3 2.04z"
+    />
+  </svg>
+);
 
 const TeamSection: FC = () => {
-  const { t } = useTranslation()
+  const { t } = useTranslation();
 
   return (
-    <section id="team" className="py-20 bg-white">
-      <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 text-center">
-        <p className=" font-semibold uppercase tracking-wider text-tmbbbyblue font-rubikOne text-4xl">
-          {t('team.tag')}
+    <section id="team" className="py-20 bg-[#f6f7f9]">
+      <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+        <p className="text-tmbbbyblue font-rubikOne text-3xl sm:text-4xl tracking-tight">
+          {t("team.tag")}
         </p>
-        <h2 className="mt-2 text-2xl sm:text-2xl md:text-2xl font-extrabold text-andesnavy font-rubikMono ">
-          {t('team.title')}
+        <h2 className="mt-2 text-andesnavy font-rubikMono text-2xl sm:text-3xl font-extrabold">
+          {t("team.title")}
         </h2>
 
-        <div className="mt-12 grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
-          {MEMBERS.map((m, i) => (
-            <motion.article
-              key={m.key}
-              initial={{ opacity: 0, y: 40 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: '-100px' }}
-              transition={{ duration: 0.5, delay: i * 0.15 }}
-              className="group flex flex-col items-center px-4"
-            >
-              {/* Avatar con “ring” dinámico */}
-              <div
-                className={clsx(
-                  'relative w-36 h-36 rounded-full overflow-hidden ring-4 ring-offset-2 transition-all duration-300',
-                  'group-hover:ring-8 group-hover:ring-offset-0',
-                  `ring-tmbyellow`
-                )}
+        <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          {MEMBERS.map((m, i) => {
+            // Nombre sin edad al final por si viene en i18n (e.g., "Juan, 23")
+            const rawName = t(`team.members.${m.key}.name`);
+            const cleanName = String(rawName).replace(/,\s*\d+\s*$/g, "");
+
+            // Degradado que llega hasta abajo (100%)
+            const imgBg = `linear-gradient(180deg, ${m.theme}66 0%, ${m.theme}22 40%, #ffffff 100%)`;
+
+            return (
+              <motion.article
+                key={m.key}
+                initial={{ opacity: 0, y: 40 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-100px" }}
+                transition={{ duration: 0.5, delay: i * 0.12 }}
+                whileHover={{ y: -3, rotate: 0.0001 }}
+                className="relative overflow-hidden rounded-[26px] bg-white shadow-[0_10px_30px_rgba(0,0,0,.07)] ring-1 ring-black/5 flex flex-col"
               >
-                <img
-                  src={m.img}
-                  alt={t(`team.members.${m.key}.name`)}
-                  className="w-full h-full object-cover"
-                />
-                {/* placeholder si la imagen no carga */}
-                <UserRound
-                  size={32}
-                  className="absolute inset-0 m-auto text-white opacity-0 group-hover:opacity-20"
-                />
-              </div>
+                {/* Pestaña superior */}
+                <div className="h-3 w-full" style={{ background: m.theme }} />
 
-              {/* Nombre y pronombres */}
-              <h3 className="mt-6 text-xl font-semibold text-andesnavy">
-                {t(`team.members.${m.key}.name`)}
-              </h3>
-              <p className="text-sm font-medium text-gray-500 mb-4">
-                {t(`team.members.${m.key}.pronouns`)}
-              </p>
+                {/* Encabezado + bio */}
+                <div className="px-5 pt-4 pb-3">
+                  <div className="flex items-start justify-between gap-3">
+                    <span className="inline-flex items-center rounded-full bg-black/5 px-3 py-1 text-[11px] font-semibold text-neutral-800">
+                      {t("team.ageLabel", { defaultValue: "{{count}} años", count: m.age })}
+                    </span>
+                    <a
+                      href={m.songUrl || "#"}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="inline-flex items-center gap-2 rounded-full bg-black/80 px-3 py-1 text-[11px] font-semibold text-white hover:bg-black"
+                    >
+                      <SpotifyIcon className="h-3.5 w-3.5" />
+                      <span>{t("team.favoriteSong", { defaultValue: "Mi canción favorita" })}</span>
+                      <ArrowUpRight className="h-3.5 w-3.5" />
+                    </a>
+                  </div>
 
-              {/* Bio */}
-              <p className="text-base text-gray-600 leading-relaxed font-quicksand">
-                {t(`team.members.${m.key}.bio`)}
-              </p>
-            </motion.article>
-          ))}
+                  <h3 className="mt-4 text-[28px] leading-8 font-extrabold tracking-tight text-neutral-900">
+                    {cleanName}
+                  </h3>
+                  <p className="mt-0.5 text-sm font-medium text-neutral-600">
+                    {t(`team.members.${m.key}.pronouns`)}
+                  </p>
+
+                  <p className="mt-3 text-[15px] leading-[1.6] text-neutral-800 font-quicksand max-w-[70ch]">
+                    {t(`team.members.${m.key}.bio`)}
+                  </p>
+                </div>
+
+                {/* FOTO FULL-BLEED pegada al borde inferior */}
+                <div className="relative w-full flex-1" style={{ background: imgBg }}>
+                  <img
+                    src={m.img}
+                    alt={cleanName}
+                    className="block w-full h-full object-contain"
+                    loading="lazy"
+                  />
+                </div>
+              </motion.article>
+            );
+          })}
         </div>
       </div>
     </section>
-  )
-}
+  );
+};
 
-export default TeamSection
+export default TeamSection;

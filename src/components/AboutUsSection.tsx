@@ -1,198 +1,328 @@
 // src/components/AboutUsSection.tsx
-import { useState, useMemo } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { motion, AnimatePresence, useMotionValue, useTransform } from "framer-motion";
 import { useTranslation } from "react-i18next";
 import { usePreloadOnIntersect } from "../hooks/usePreloadOnIntersect";
 
-// Imágenes
-import t1 from "../assets/t1.svg";
-import t2 from "../assets/t2.svg";
-import t3 from "../assets/t3.svg";
+// Assets (ajusta rutas si cambian)
+import t1 from "../assets/t1.png";
+import t2 from "../assets/t2.png";
+import t3 from "../assets/t3.png";
 import pia from "../assets/pia.svg";
 import adrian from "../assets/adri.svg";
 import mateo from "../assets/mateo.svg";
 
-type CategoryKey = "ride" | "learn" | "change";
-type Category = {
-  key: CategoryKey;
-  color: string;
-  categoryImg: string;
-  testimonialImg: string;
+type Key = "ride" | "learn" | "change";
+type Card = {
+  key: Key;
+  img: string;
+  avatar: string;
+  accent: string;
+  ribbon: [string, string];
 };
 
-const CATEGORIES: Category[] = [
-  { key: "ride",   color: "#D2042D", categoryImg: t1, testimonialImg: mateo },
-  { key: "learn",  color: "#0075FF", categoryImg: t2, testimonialImg: pia   },
-  { key: "change", color: "#6EB44E", categoryImg: t3, testimonialImg: adrian},
+const CARDS: Card[] = [
+  {
+    key: "ride",
+    img: t1,
+    avatar: mateo,
+    accent: "#9958fd",              // púrpura
+    ribbon: ["#eadbff", "#f6f0ff"], // suaves a juego
+  },
+  {
+    key: "learn",
+    img: t2,
+    avatar: pia,
+    accent: "#d6ef0a",              // lima
+    ribbon: ["#f0f8b3", "#f8fde0"],
+  },
+  {
+    key: "change",
+    img: t3,
+    avatar: adrian,
+    accent: "#fe8303",              // naranja
+    ribbon: ["#ffd9b3", "#fff2e3"],
+  },
 ];
+
+function useReduced() {
+  const [reduced, setReduced] = useState(false);
+  useEffect(() => {
+    const m = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const on = () => setReduced(m.matches);
+    on(); m.addEventListener("change", on);
+    return () => m.removeEventListener("change", on);
+  }, []);
+  return reduced;
+}
 
 export default function AboutUsSection() {
   const { t } = useTranslation();
-  const [active, setActive] = useState<CategoryKey | null>(null);
+  const reduced = useReduced();
 
-  // Precarga anticipada de TODO lo que la sección va a necesitar
-  // (si quieres, puedes dividir por sub-sección para afinar).
-  const imagesToPreload = useMemo(
-    () => [
-      t1, t2, t3,
-      pia, adrian, mateo
-    ],
-    []
+  // Precarga anticipada para evitar flashes
+  const preloadRef = usePreloadOnIntersect(
+    useMemo(() => [t1, t2, t3, pia, adrian, mateo], []),
+    { rootMargin: "1000px 0px", once: true }
   );
-  // El sentinela se pone ANTES del bloque visual (ver más abajo).
-  const preloadRef = usePreloadOnIntersect(imagesToPreload, {
-    rootMargin: "1200px 0px", // ~1.2 pantallas antes
-    once: true,
-  });
+
+  // Modal/spotlight de testimonio
+  const [active, setActive] = useState<Key | null>(null);
+  const open = (k: Key) => setActive(k);
+  const close = () => setActive(null);
+
+  // Foco accesible para botón de cerrar
+  const focusCloseRef = useRef<HTMLButtonElement>(null);
+  useEffect(() => {
+    if (active && focusCloseRef.current) focusCloseRef.current.focus();
+  }, [active]);
+
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") close(); };
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, []);
 
   return (
-    <section id="about" className="bg-white w-screen overflow-hidden">
-      {/* SENTINELA: apenas el usuario se acerque, arrancamos precarga */}
+    <section className="relative w-full bg-white">
+      {/* Dispara precarga al aproximarse */}
       <div ref={preloadRef} aria-hidden="true" />
 
-      {/* TÍTULO PRINCIPAL */}
-      <div className="w-screen px-4 sm:px-6 lg:px-8 pt-6 pb-2">
+      {/* ── ENCABEZADO: subtítulo arriba, título abajo ───────────────────── */}
+      <header className="mx-auto max-w-7xl px-4 sm:px-6 pt-12 pb-6 text-center">
+        <p className="mx-auto mb-2 max-w-3xl text-[clamp(.95rem,1.6vw,1.1rem)] tracking-wide text-andesnavy/80 font-quicksand uppercase">
+          {t("mission.mid")}
+        </p>
+
+        {/* Título con degradado en la nueva paleta */}
         <h2
           className="
-            text-center text-tmbred font-rubikOne uppercase
-            tracking-[0.06em] leading-[0.95]
-            text-5xl sm:text-6xl md:text-7xl lg:text-8xl
+            font-rubikOne uppercase tracking-[.06em]
+            text-[clamp(2rem,4.8vw,4rem)] leading-tight
+            text-transparent bg-clip-text
+            bg-gradient-to-r from-[#9958fd] via-[#d6ef0a] to-[#fe8303]
           "
         >
           {t("about.inviteTitle")}
         </h2>
+      </header>
+
+      {/* Paneles de sección */}
+      <div className="mx-auto max-w-7xl space-y-10 px-0 sm:px-6 md:space-y-14">
+        {CARDS.map((c, i) => (
+          <PanelRow
+            key={c.key}
+            id={`showcase-${c.key}`}
+            card={c}
+            mirrored={i % 2 === 1}
+            reduced={reduced}
+            onOpen={() => open(c.key)}
+          />
+        ))}
       </div>
 
-      {CATEGORIES.map((cat) => {
-        const isOpen = active === cat.key;
+      {/* Spotlight de testimonio */}
+      <AnimatePresence>
+        {active && (
+          <Spotlight
+            card={CARDS.find(c => c.key === active)!}
+            close={close}
+            focusCloseRef={focusCloseRef}
+          />
+        )}
+      </AnimatePresence>
+    </section>
+  );
+}
 
-        return (
-          <motion.div
-            key={cat.key}
-            className="relative w-screen overflow-hidden lg:h-[75vh]"
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 30 }}
-            viewport={{ once: false, amount: 0.3 }}
-            transition={{ duration: 0.6, ease: "easeInOut" }}
+/* ------------------------ PanelRow ------------------------ */
+
+function PanelRow({
+  id,
+  card,
+  mirrored,
+  reduced,
+  onOpen,
+}: {
+  id: string;
+  card: Card;
+  mirrored?: boolean;
+  reduced?: boolean;
+  onOpen: () => void;
+}) {
+  const { t } = useTranslation();
+  const x = useMotionValue(0);
+  const y = useTransform(x, [-100, 100], [-8, 8]); // micro-parallax leve
+
+  return (
+    <section id={id} className="relative">
+      {/* Fondo tipo ribbon (sin blur) */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 -z-10"
+        style={{
+          background:
+            `radial-gradient(1000px 260px at ${mirrored ? "20%" : "80%"} 18%, ${card.ribbon[0]}, transparent 65%),
+             radial-gradient(800px 220px at ${mirrored ? "75%" : "25%"} 75%, ${card.ribbon[1]}, transparent 60%)`,
+        }}
+      />
+
+      <div className="grid items-center gap-6 sm:gap-8 md:gap-10 lg:grid-cols-12 px-4 sm:px-0">
+        {/* Texto */}
+        <div className={`lg:col-span-5 ${mirrored ? "lg:order-2" : ""}`}>
+          <h3
+            className="font-rubikOne uppercase leading-[0.98] text-[clamp(1.8rem,4vw,3rem)] mb-3"
+            style={{ color: card.accent }}
           >
-            {/* Columna izquierda */}
-            <div className="relative z-10 max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8 py-6 lg:py-10">
-              <div className="lg:w-1/2">
-                <h3
-                  className="
-                    font-rubikOne font-bold uppercase
-                    text-4xl sm:text-5xl lg:text-6xl
-                    leading-[0.98] mb-4
-                  "
-                  style={{ color: cat.color }}
-                >
-                  {t(`about.cards.${cat.key}.title`)}
+            {t(`about.cards.${card.key}.title`)}
+          </h3>
+          <p className="text-[clamp(1rem,1.7vw,1.2rem)] text-andesnavy/90 leading-relaxed font-quicksand">
+            {t(`about.cards.${card.key}.desc`)}
+          </p>
+
+        <div className="mt-5 flex flex-wrap gap-3">
+            <button
+              onClick={onOpen}
+              className="rounded-full px-5 py-2 text-sm font-semibold shadow transition active:translate-y-px focus:outline-none focus:ring-2 focus:ring-offset-2"
+              style={{ background: card.accent, color: "#fff" }}
+            >
+              {t("about.testimonials.show")}
+            </button>
+          </div>
+        </div>
+
+        {/* Imagen (sin blur) */}
+        <div className={`lg:col-span-7 ${mirrored ? "lg:order-1" : ""}`}>
+          <motion.div
+            className={`relative ${mirrored ? "lg:pr-8" : "lg:pl-8"}`}
+            style={{ x, y }}
+            drag={reduced ? false : "x"}
+            dragConstraints={{ left: -30, right: 30 }}
+            dragElastic={0.08}
+          >
+            <div className="relative rounded-[2rem] shadow-[0_20px_60px_rgba(0,0,0,.12)]">
+              <img
+                src={card.img}
+                alt=""
+                className="block h-[52vh] min-h-[280px] w-full rounded-[2rem] object-cover
+                           sm:h-[56vh] md:h-[58vh] lg:h-[60vh]"
+                loading="lazy"
+                decoding="async"
+              />
+            </div>
+          </motion.div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ------------------------ Spotlight (Modal de testimonio) ------------------------ */
+
+function Spotlight({
+  card,
+  close,
+  focusCloseRef,
+}: {
+  card: Card;
+  close: () => void;
+  focusCloseRef: React.RefObject<HTMLButtonElement | null>;
+}) {
+  const { t } = useTranslation();
+  const y = useMotionValue(0);
+  const opacityBg = useTransform(y, [-200, 0, 200], [0.6, 0.72, 0.6]);
+
+  return (
+    <motion.div
+      className="fixed inset-0 z-[60] flex items-center justify-center"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      aria-modal="true"
+      role="dialog"
+      aria-labelledby="spotlight-title"
+    >
+      {/* Backdrop (sin blur) */}
+      <motion.div
+        className="absolute inset-0 bg-black/70"
+        style={{ opacity: opacityBg }}
+        onClick={close}
+      />
+
+      {/* Tarjeta */}
+      <motion.div
+        className="relative z-10 w-[min(92vw,900px)] overflow-hidden rounded-[28px] bg-white shadow-2xl ring-1 ring-black/10"
+        drag="y"
+        dragConstraints={{ top: -60, bottom: 60 }}
+        dragElastic={0.12}
+        style={{ y }}
+        onDragEnd={(_, info) => { if (Math.abs(info.offset.y) > 120) close(); }}
+        initial={{ scale: 0.96, y: 16, opacity: 0 }}
+        animate={{ scale: 1, y: 0, opacity: 1 }}
+        exit={{ scale: 0.96, y: 16, opacity: 0 }}
+        transition={{ type: "spring", stiffness: 220, damping: 24 }}
+      >
+        {/* Borde suave */}
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-0 rounded-[28px]"
+          style={{
+            padding: 2,
+            background: `linear-gradient(135deg, ${card.accent}, rgba(255,255,255,.5), rgba(0,0,0,.08))`,
+            WebkitMask: "linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)",
+            WebkitMaskComposite: "xor",
+            maskComposite: "exclude",
+          }}
+        />
+
+        <div className="grid grid-cols-1 md:grid-cols-2">
+          <div className="relative">
+            <img
+              src={card.img}
+              alt=""
+              className="h-64 w-full object-cover md:h-full"
+              loading="lazy"
+              decoding="async"
+            />
+          </div>
+
+          <div className="relative p-6 sm:p-8">
+            <div className="mb-4 flex items-center gap-3">
+              <div className="h-14 w-14 overflow-hidden rounded-full ring-4 ring-white" style={{ background: card.accent }}>
+                <img src={card.avatar} alt="" className="h-full w-full object-cover" />
+              </div>
+              <div>
+                <h3 id="spotlight-title" className="text-xl font-bold text-andesnavy">
+                  {t(`aboutTestimonials.${card.key}.name`)}
                 </h3>
-
-                <p className="text-lg md:text-xl text-andesnavy mb-6 font-quicksand leading-relaxed">
-                  {t(`about.cards.${cat.key}.desc`)}
-                </p>
-
-                <button
-                  onClick={() => setActive(isOpen ? null : cat.key)}
-                  aria-expanded={isOpen}
-                  aria-controls={`testimonial-${cat.key}`}
-                  className="
-                    inline-block max-w-xs w-full sm:w-auto
-                    rounded-full px-6 py-2
-                    text-sm md:text-base font-medium
-                    transition-transform duration-300 ease-in-out hover:scale-105
-                    border-2
-                    focus:outline-none focus:ring-2 focus:ring-offset-2
-                  "
-                  style={
-                    isOpen
-                      ? { backgroundColor: cat.color, color: "#fff", borderColor: cat.color }
-                      : { backgroundColor: "transparent", color: cat.color, borderColor: cat.color }
-                  }
-                >
-                  {isOpen ? t("about.testimonials.hide") : t("about.testimonials.show")}
-                </button>
+                <p className="text-sm text-andesnavy/70">{t(`aboutTestimonials.${card.key}.age`)}</p>
               </div>
             </div>
 
-            {/* Columna derecha */}
-            <div
-              className={`
-                block w-screen
-                lg:absolute lg:inset-y-0 lg:right-0 lg:w-1/2
-                flex justify-center items-start
-                px-0
-                ${isOpen ? "pt-6 lg:pt-10" : "pt-0"}
-                h-full
-              `}
+            <h4
+              className="font-rubikOne uppercase leading-tight text-[clamp(1.3rem,2.6vw,1.8rem)] mb-2"
+              style={{ color: card.accent }}
             >
-              <AnimatePresence mode="wait">
-                {isOpen ? (
-                  <motion.div
-                    id={`testimonial-${cat.key}`}
-                    key="testimonial"
-                    className="
-                      bg-white rounded-2xl shadow-xl
-                      w-[92vw] max-w-md sm:max-w-lg md:max-w-xl
-                      p-6 sm:p-8 text-center
-                    "
-                    initial={{ opacity: 0, scale: 0.95 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, scale: 0.95 }}
-                    transition={{ duration: 0.35, ease: "easeInOut" }}
-                  >
-                    <div
-                      className="
-                        mx-auto mb-5
-                        w-36 h-36 sm:w-40 sm:h-40
-                        rounded-full overflow-hidden ring-4 ring-white
-                      "
-                      style={{ backgroundColor: cat.color }}
-                    >
-                      <img
-                        src={cat.testimonialImg}
-                        alt={(t(`aboutTestimonials.${cat.key}.name`) as string) || ""}
-                        className="w-full h-full object-cover"
-                        width={160} height={160}
-                        loading="lazy"
-                        decoding="async"
-                      />
-                    </div>
+              {t(`about.cards.${card.key}.title`)}
+            </h4>
 
-                    <h4 className="text-2xl sm:text-3xl font-semibold text-andesnavy mb-2">
-                      {t(`aboutTestimonials.${cat.key}.name`)}, {t(`aboutTestimonials.${cat.key}.age`)}
-                    </h4>
+            <p className="text-[15px] leading-relaxed text-andesnavy/90 font-quicksand italic">
+              {t(`aboutTestimonials.${card.key}.text`)}
+            </p>
 
-                    <p className="text-andesnavy/80 text-lg sm:text-xl italic">
-                      {t(`aboutTestimonials.${cat.key}.text`)}
-                    </p>
-                  </motion.div>
-                ) : (
-                  <motion.img
-                    key="categoryImg"
-                    src={cat.categoryImg}
-                    alt={(t(`about.cards.${cat.key}.title`) as string) || ""}
-                    className="
-                      block w-screen lg:w-full
-                      h-64 sm:h-80 md:h-96 lg:h-full
-                      object-cover
-                    "
-                    width={1600} height={900}
-                    loading="lazy"
-                    decoding="async"
-                    initial={{ opacity: 0, x: 50 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: 50 }}
-                    transition={{ duration: 0.5, ease: "easeInOut" }}
-                  />
-                )}
-              </AnimatePresence>
+            <div className="mt-6">
+              <button
+                ref={focusCloseRef}
+                onClick={close}
+                className="rounded-full border-2 px-5 py-2 text-sm font-semibold transition hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2"
+                style={{ borderColor: card.accent, color: card.accent }}
+              >
+                {t("about.testimonials.hide")}
+              </button>
             </div>
-          </motion.div>
-        );
-      })}
-    </section>
+          </div>
+        </div>
+      </motion.div>
+    </motion.div>
   );
 }
