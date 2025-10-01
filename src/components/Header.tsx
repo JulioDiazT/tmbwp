@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { Link, NavLink } from "react-router-dom";
 import { Menu, X } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import Logo from "../assets/logorojo.svg?url";
+import Logo from "../assets/logonegro.svg";
 
 const navItems = [
   { path: "/recuerdos",    labelKey: "nav.memories" },
