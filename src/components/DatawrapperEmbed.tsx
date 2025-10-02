@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import  { useEffect, useRef } from "react";
 
 type Props = {
   /** ID del chart en Datawrapper, p.ej. "zsQUP" */

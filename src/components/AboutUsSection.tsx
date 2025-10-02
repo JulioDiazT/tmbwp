@@ -117,7 +117,6 @@ function PanelRow({
   id,
   card,
   mirrored,
-  reduced,
   onOpen,
 }: {
   id: string;
