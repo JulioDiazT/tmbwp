@@ -1,8 +1,11 @@
+// src/components/Footer.tsx
 import { Instagram, Linkedin, ArrowRight } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 import logoUrl from "../assets/logoblanco.svg";
 import { useMemo } from "react";
+
+const GREEN = "#d6ef0a";
 
 export default function Footer() {
   const { t } = useTranslation();
@@ -10,42 +13,50 @@ export default function Footer() {
 
   const nav = useMemo(
     () => [
-      { to: "/recuerdos", label: t("nav.memories", "Recuerdos") },
+      { to: "/recuerdos",    label: t("nav.memories", "Recuerdos") },
       { to: "/voluntariado", label: t("nav.volunteering", "Voluntariado") },
-      { to: "/cyclestacks", label: t("nav.cyclestacks", "Cicloteca") },
+      { to: "/cyclestacks",  label: t("nav.cyclestacks", "Cicloteca") },
     ],
     [t]
   );
 
   return (
-    <footer className="mt-auto relative border-t border-white/10 bg-gradient-to-b from-neutral-900 to-black text-neutral-100">
-      {/* halo sutil */}
-      <div aria-hidden className="pointer-events-none absolute inset-x-0 -top-20 flex justify-center">
-        <div className="h-40 w-[32rem] rounded-full bg-white/10 blur-3xl" />
+    <footer className="mt-auto relative bg-neutral-950 text-neutral-100">
+      {/* Acento superior verde */}
+      <div className="h-1.5 w-full" style={{ background: GREEN }} />
+
+      {/* Halo sutil */}
+      <div aria-hidden className="pointer-events-none absolute inset-x-0 -top-16 flex justify-center">
+        <div className="h-36 w-[28rem] rounded-full bg-white/10 blur-3xl" />
       </div>
 
-      <div className="relative mx-auto max-w-7xl px-6 py-10">
-        <div className="rounded-3xl bg-white/5 p-6 md:p-7 lg:p-8 shadow-2xl ring-1 ring-white/10 backdrop-blur-md">
-          {/* columna 3 más ancha para ocupar espacio */}
-          <div className="grid grid-cols-1 gap-10 md:grid-cols-[1.1fr_1fr_1.9fr]">
+      <div className="relative mx-auto max-w-8xl px-6 py-12">
+        {/* contenedor glass sin borde azul */}
+        <div className="rounded-3xl bg-white/[0.04] p-6 md:p-8 shadow-[0_20px_60px_rgba(0,0,0,.35)] border border-white/10 backdrop-blur-md">
+          <div className="grid grid-cols-1 gap-10 md:grid-cols-[1.2fr_1fr_1.6fr]">
             {/* Brand */}
-            <div className="space-y-3">
-              <Link to="/" className="group inline-flex items-center gap-3">
-               <img
+            <div className="space-y-4">
+              <Link to="/" className="inline-flex items-center gap-3">
+                <img
                   src={logoUrl}
                   alt="Tomebambike"
-                  className="h-16 w-auto block drop-shadow-[0_1px_6px_rgba(0,0,0,0.25)]"
+                  className="h-16 w-auto block drop-shadow-[0_1px_6px_rgba(0,0,0,0.35)]"
+                  loading="eager"
+                  decoding="async"
                 />
-              
               </Link>
-              <p className="text-sm text-neutral-300/90">
-                {t("footer.tagline", "Ciudades más sanas, seguras e inclusivas — un pedal a la vez.")}
+
+              <p className="text-[15.5px] leading-relaxed text-neutral-200/90 max-w-[48ch]">
+                {t(
+                  "footer.tagline",
+                  "Ciudades más sanas, seguras e inclusivas — un pedal a la vez."
+                )}
               </p>
             </div>
 
-            {/* Enlaces rápidos (vertical) */}
+            {/* Enlaces rápidos */}
             <nav>
-              <p className="mb-3 text-sm font-semibold uppercase tracking-wide text-neutral-300">
+              <p className="mb-3 text-xs sm:text-sm font-semibold uppercase tracking-wider text-neutral-300">
                 {t("footer.quicklinks", "Enlaces rápidos")}
               </p>
               <ul className="flex flex-col gap-2.5">
@@ -53,11 +64,13 @@ export default function Footer() {
                   <li key={to}>
                     <Link
                       to={to}
-                      className="group inline-flex w-full items-center justify-between rounded-lg px-2 py-1.5 transition hover:bg-white/5"
+                      className="group inline-flex w-full items-center justify-between rounded-lg px-2 py-2 transition hover:bg-white/5 focus:outline-none focus:ring-2 focus:ring-[rgba(214,239,10,.55)]"
                     >
-                      <span className="text-base text-neutral-100/90">{label}</span>
+                      <span className="uppercase text-[16px] sm:text-[17px] font-semibold text-neutral-100/95 relative after:absolute after:left-0 after:-bottom-0.5 after:h-[2px] after:w-0 after:bg-[rgba(214,239,10,1)] after:rounded-full after:transition-all group-hover:after:w-full">
+                        {label}
+                      </span>
                       <ArrowRight
-                        size={16}
+                        size={18}
                         className="shrink-0 translate-x-0 opacity-0 transition group-hover:translate-x-1 group-hover:opacity-100"
                       />
                     </Link>
@@ -66,41 +79,52 @@ export default function Footer() {
               </ul>
             </nav>
 
-            {/* CTA primero, “Síguenos” debajo */}
-            <section className="space-y-4">
-              {/* CTA ancho */}
-              <div className="rounded-2xl bg-gradient-to-r from-white/10 to-white/5 p-4 ring-1 ring-white/10 md:p-5">
-                <p className="text-sm font-semibold">
+            {/* CTA + Redes */}
+            <section className="space-y-5">
+              {/* CTA legible, sin borde azul */}
+              <div className="rounded-2xl bg-white/[0.05] p-5 border border-white/12">
+                <p className="text-sm font-semibold uppercase tracking-wider text-neutral-100/95">
                   {t("footer.ctaTitle", "¿Quieres enterarte de nuestros eventos?")}
                 </p>
-                <p className="mt-1 text-sm text-neutral-300/90">
-                  {t("footer.ctaDesc", "Síguenos en Instagram y activa las notificaciones. Allí publicamos fechas, rutas y cupos.")}
+                <p className="mt-2 text-[15.5px] leading-relaxed text-neutral-200/90">
+                  {t(
+                    "footer.ctaDesc",
+                    "Síguenos en Instagram y activa las notificaciones. Allí publicamos fechas, rutas y cupos."
+                  )}
                 </p>
-                {/* Botón con cambio de color de texto en hover */}
+
+                {/* Botón grande (outline + fill on hover) */}
                 <a
                   href="https://instagram.com/tomebambike"
                   target="_blank"
                   rel="noreferrer"
-                  className="group relative mt-3 inline-flex w-full items-center justify-center overflow-hidden rounded-2xl bg-primary px-4 py-2.5 text-sm font-semibold text-black transition
-                             hover:-translate-y-[1px] hover:shadow-[0_10px_30px_-10px_rgba(255,0,0,0.45)]
-                             focus:outline-none focus:ring-2 focus:ring-primary/60"
+                  className="
+                    group relative mt-4 inline-flex w-full items-center justify-center
+                    rounded-2xl px-5 py-3.5 text-[15.5px] font-semibold
+                    backdrop-blur transition-all duration-200
+                  "
+                  style={{
+                    color: "#f5f5f5",
+                    background: "rgba(255,255,255,0.04)",
+                    boxShadow: "inset 0 0 0 2px " + GREEN,
+                    borderColor: GREEN,
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.background = GREEN;
+                    e.currentTarget.style.color = "#0c0c0c";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.background = "rgba(255,255,255,0.04)";
+                    e.currentTarget.style.color = "#f5f5f5";
+                  }}
                 >
-                  {/* brillo diagonal */}
-                  <span
-                    aria-hidden
-                    className="pointer-events-none absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/40 to-transparent opacity-0 transition
-                               group-hover:translate-x-full group-hover:opacity-100"
-                    style={{ WebkitMaskImage: 'linear-gradient(90deg, transparent 40%, #000 50%, transparent 60%)' }}
-                  />
-                  <span className="relative transition-colors group-hover:text-white">
-                    {t("footer.ctaButton", "Ver próximos eventos en Instagram")}
-                  </span>
+                  {t("footer.ctaButton", "Ver próximos eventos en Instagram")}
                 </a>
               </div>
 
-              {/* “Síguenos” debajo del CTA */}
+              {/* Redes */}
               <div className="space-y-3">
-                <p className="text-sm font-semibold uppercase tracking-wide text-neutral-300">
+                <p className="text-xs sm:text-sm font-semibold uppercase tracking-wider text-neutral-300">
                   {t("footer.follow", "Síguenos")}
                 </p>
                 <div className="flex gap-3">
@@ -109,39 +133,30 @@ export default function Footer() {
                     target="_blank"
                     rel="noreferrer"
                     aria-label="Instagram"
-                    className="inline-flex h-10 w-10 items-center justify-center rounded-2xl ring-1 ring-white/10 transition hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-primary/60"
+                    className="inline-flex h-11 w-11 items-center justify-center rounded-2xl border border-white/10 bg-white/0 backdrop-blur transition hover:bg-white/[0.08] focus:outline-none focus:ring-2 focus:ring-[rgba(214,239,10,.55)]"
                   >
-                    <Instagram size={18} />
+                    <Instagram size={20} />
                   </a>
                   <a
                     href="https://www.linkedin.com/company/tomebambike/"
                     target="_blank"
                     rel="noreferrer"
                     aria-label="LinkedIn"
-                    className="inline-flex h-10 w-10 items-center justify-center rounded-2xl ring-1 ring-white/10 transition hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-primary/60"
+                    className="inline-flex h-11 w-11 items-center justify-center rounded-2xl border border-white/10 bg-white/0 backdrop-blur transition hover:bg-white/[0.08] focus:outline-none focus:ring-2 focus:ring-[rgba(214,239,10,.55)]"
                   >
-                    <Linkedin size={18} />
+                    <Linkedin size={20} />
                   </a>
                 </div>
               </div>
             </section>
           </div>
 
-          {/* Divider compacto */}
-          <div className="my-6 h-px w-full bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+          {/* Divider */}
+          <div className="my-8 h-px w-full bg-gradient-to-r from-transparent via-white/10 to-transparent" />
 
-          {/* Bottom bar */}
-          <div className="flex flex-col items-center justify-between gap-3 text-sm text-neutral-300 md:flex-row">
-            <p>© {year} Tomebambike — {t("footer.rights", "Todos los derechos reservados")}</p>
-            <div className="flex items-center gap-4">
-              <Link to="/privacidad" className="hover:text-white/90">
-                {t("footer.privacyLink", "Privacidad")}
-              </Link>
-              <span aria-hidden>·</span>
-              <Link to="/terminos" className="hover:text-white/90">
-                {t("footer.termsLink", "Términos")}
-              </Link>
-            </div>
+          {/* Copyright centrado */}
+          <div className="text-center text-[14.5px] text-neutral-300">
+            © {year} Tomebambike — {t("footer.rights", "Todos los derechos reservados")}
           </div>
         </div>
       </div>

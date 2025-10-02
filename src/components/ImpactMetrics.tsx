@@ -4,7 +4,6 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useInView } from "react-intersection-observer";
 import { motion, useAnimation, Variants } from "framer-motion";
 
-// Iconos de lucide-react
 import {
   MapPin,
   Wrench,
@@ -19,20 +18,20 @@ interface Metric {
   labelKey: string;
   value: number;
   suffix?: string;
-  color: string;     // se usará como --accent
   Icon: LucideIcon;
 }
 
 /** Paleta de acentos (marca) */
 const BRAND = ["#9958fd", "#d6ef0a", "#fe8303"] as const;
 
+/** Sólo contenido; los colores se asignan por posición para garantizar patrón morado→verde→naranja */
 const METRICS: Metric[] = [
-  { labelKey: "metrics.rides",     value: 20,  suffix: "",    color: BRAND[0], Icon: MapPin   },
-  { labelKey: "metrics.workshops", value: 12,  suffix: "",    color: BRAND[2], Icon: Wrench   },
-  { labelKey: "metrics.people",    value: 200, suffix: "",    color: BRAND[1], Icon: Users    },
-  { labelKey: "metrics.co2",       value: 1,   suffix: " t",  color: BRAND[0], Icon: Cloud    },
-  { labelKey: "metrics.km",        value: 200, suffix: " km", color: BRAND[1], Icon: Activity },
-  { labelKey: "metrics.speakers",  value: 12,  suffix: "",    color: BRAND[2], Icon: Mic2     },
+  { labelKey: "metrics.rides",     value: 20,  suffix: "",    Icon: MapPin   },
+  { labelKey: "metrics.workshops", value: 12,  suffix: "",    Icon: Wrench   },
+  { labelKey: "metrics.people",    value: 200, suffix: "",    Icon: Users    },
+  { labelKey: "metrics.co2",       value: 1,   suffix: " t",  Icon: Cloud    },
+  { labelKey: "metrics.km",        value: 200, suffix: " km", Icon: Activity },
+  { labelKey: "metrics.speakers",  value: 12,  suffix: "",    Icon: Mic2     },
 ];
 
 export default function ImpactMetrics() {
@@ -67,11 +66,11 @@ export default function ImpactMetrics() {
     <section
       ref={ref}
       className="
-        relative py-20 
-        bg-[radial-gradient(900px_400px_at_20%_-10%,rgba(153,88,253,0.10),transparent_60%),radial-gradient(900px_400px_at_80%_110%,rgba(254,131,3,0.10),transparent_60%),linear-gradient(180deg,#f7f8fb_0%,#ffffff_100%)]
+        relative py-20 my-16                  /* margen interno y externo */
+        bg-[linear-gradient(180deg,#f7f8fb_0%,#ffffff_100%)]
       "
     >
-      {/* pestaña sutil superior */}
+      {/* pestaña superior en colores de marca */}
       <div
         className="pointer-events-none absolute top-0 left-0 right-0 h-1.5"
         style={{
@@ -91,74 +90,62 @@ export default function ImpactMetrics() {
           animate={controls}
           variants={container}
         >
-          {METRICS.map(({ labelKey, value, suffix, color, Icon }) => (
-            <motion.li
-              key={labelKey}
-              variants={item}
-              whileHover={{ y: -4 }}
-              className="group relative overflow-hidden rounded-3xl bg-white/90 backdrop-blur-sm ring-1 ring-black/5 shadow-[0_10px_30px_rgba(0,0,0,.06)] p-5"
-              style={
-                {
-                  // CSS var para acento
-                  ["--accent" as any]: color,
-                } as React.CSSProperties
-              }
-            >
-              {/* Header: icono dentro de chip con borde en gradiente */}
-              <div className="flex items-start justify-between">
-                <div className="relative">
-                  <span className="inline-grid place-items-center h-12 w-12 rounded-2xl text-white shadow-sm transition-transform duration-200 group-hover:scale-[1.03]"
-                        style={{
-                          background:
-                            "linear-gradient(135deg,var(--accent),rgba(0,0,0,0.85))",
-                          boxShadow: "0 10px 24px rgba(0,0,0,.10)",
-                        }}>
-                    <Icon size={22} className="opacity-95" />
+          {METRICS.map(({ labelKey, value, suffix, Icon }, i) => {
+            const accent = BRAND[i % 3]; // patrón fijo morado → verde → naranja
+            return (
+              <motion.li
+                key={labelKey}
+                variants={item}
+                whileHover={{ y: -4 }}
+                className="group relative overflow-hidden rounded-3xl bg-white/90 backdrop-blur-sm ring-1 ring-black/5 shadow-[0_10px_30px_rgba(0,0,0,.06)] p-5"
+                style={{ ["--accent" as any]: accent } as React.CSSProperties}
+              >
+                {/* Layout horizontal: icono grande izquierda + contenido derecha */}
+                <div className="flex items-center gap-5">
+                  {/* Icono grande, fondo sólido del color (sin degradado negro) */}
+                  <span
+                    className="
+                      inline-grid place-items-center
+                      h-20 w-20 sm:h-20 sm:w-20
+                      rounded-2xl text-white shrink-0
+                    "
+                    style={{
+                      background: "var(--accent)",
+                      boxShadow: "0 10px 24px rgba(0,0,0,.10)",
+                    }}
+                  >
+                    <Icon size={36} strokeWidth={2} />
                   </span>
+
+                  {/* Métrica + etiqueta centradas verticalmente para igualar la altura del icono */}
+                  <div className="min-w-0 flex-1 min-h-[84px] flex flex-col justify-center">
+                    <AnimatedNumber
+                      className="text-[2.25rem] sm:text-[2.75rem] font-extrabold leading-none"
+                      style={{ color: accent }}
+                      value={value}
+                      suffix={suffix}
+                      duration={1.8}
+                      start={inView}
+                    />
+                    <div className="mt-2 text-base sm:text-lg font-semibold text-neutral-800 truncate">
+                      {t(labelKey)}
+                    </div>
+
+                    {/* Barra de acento sólida */}
+                    <div className="mt-3 h-2 rounded-full bg-neutral-100 overflow-hidden">
+                      <motion.div
+                        initial={{ width: 0 }}
+                        animate={{ width: inView ? "100%" : 0 }}
+                        transition={{ duration: 1.2, ease: "easeOut", delay: 0.1 }}
+                        className="h-full"
+                        style={{ background: "var(--accent)", opacity: 0.35 }}
+                      />
+                    </div>
+                  </div>
                 </div>
-
-                {/* mini chip de color */}
-                <span
-                  className="h-2 w-12 rounded-full"
-                  style={{
-                    background:
-                      "linear-gradient(90deg,var(--accent),rgba(0,0,0,0.2))",
-                  }}
-                />
-              </div>
-
-              {/* Número */}
-              <div className="mt-5">
-                <AnimatedNumber
-                  className="text-4xl sm:text-5xl font-extrabold tracking-tight"
-                  style={{ color }}
-                  value={value}
-                  suffix={suffix}
-                  duration={1.8}
-                  start={inView}
-                />
-              </div>
-
-              {/* Etiqueta */}
-              <div className="mt-1 text-base sm:text-lg font-semibold text-neutral-800">
-                {t(labelKey)}
-              </div>
-
-              {/* Barra de progreso decorativa (no funcional) para dinamismo */}
-              <div className="mt-4 h-2 rounded-full bg-neutral-100 overflow-hidden">
-                <motion.div
-                  initial={{ width: 0 }}
-                  animate={{ width: inView ? "100%" : 0 }}
-                  transition={{ duration: 1.4, ease: "easeOut", delay: 0.15 }}
-                  className="h-full"
-                  style={{
-                    background:
-                      "linear-gradient(90deg,var(--accent),rgba(0,0,0,0.25))",
-                  }}
-                />
-              </div>
-            </motion.li>
-          ))}
+              </motion.li>
+            );
+          })}
         </motion.ul>
       </div>
     </section>
@@ -190,7 +177,6 @@ function AnimatedNumber({
   const rafId = useRef<number | null>(null);
 
   const easeOutCubic = (t: number) => 1 - Math.pow(1 - t, 3);
-
   const stop = () => {
     if (rafId.current !== null) cancelAnimationFrame(rafId.current);
     rafId.current = null;
@@ -212,7 +198,9 @@ function AnimatedNumber({
       const elapsed = ts - startRef.current;
       const p = Math.min(1, elapsed / totalMs);
       const eased = easeOutCubic(p);
-      const current = Math.round(fromRef.current + (value - fromRef.current) * eased);
+      const current = Math.round(
+        fromRef.current + (value - fromRef.current) * eased
+      );
       setDisplay(current);
       if (p < 1) {
         rafId.current = requestAnimationFrame(step);

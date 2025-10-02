@@ -11,9 +11,9 @@ import danielaImg from "../assets/dani.svg";
 type Member = {
   key: string;      // i18n: team.members.<key>.*
   img: string;
-  age: number;      // chip (se mantiene)
-  songUrl?: string; // link a Spotify
-  theme: string;    // #9958fd | #d6ef0a | #fe8303 (acento)
+  age: number;
+  songUrl?: string;
+  theme: string;    // #9958fd | #d6ef0a | #1097f6
 };
 
 const MEMBERS: Member[] = [
@@ -39,7 +39,7 @@ const MEMBERS: Member[] = [
     age: 25,
     songUrl:
       "https://open.spotify.com/track/0HGUJg63wQZIaaFY12rC5O?si=18Q1WUecRIuIVD3MAvj-vA",
-    theme: "#fe8303",
+    theme: "#1097f6",
   },
 ];
 
@@ -58,20 +58,29 @@ const TeamSection: FC = () => {
   return (
     <section id="team" className="py-20 bg-[#f6f7f9]">
       <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
-        <p className="text-tmbbbyblue font-rubikOne text-3xl sm:text-4xl tracking-tight">
-          {t("team.tag")}
-        </p>
-        <h2 className="mt-2 text-andesnavy font-rubikMono text-2xl sm:text-3xl font-extrabold">
-          {t("team.title")}
-        </h2>
+        {/* Encabezado coherente con el resto de la web */}
+        <header className="mb-8 sm:mb-10">
+          {/* Acento superior verde (coherente con secciones anteriores) */}
+          <div className="h-1.5 w-20 rounded-full bg-[#d6ef0a]" />
+          {/* Eyebrow / subtítulo pequeño */}
+          <p className="mt-3 text-xs sm:text-sm font-semibold tracking-wider uppercase text-andesnavy/70">
+            {t("team.tag")}
+          </p>
+          {/* Título principal */}
+          <h2
+            className="
+              mt-1 font-rubikOne uppercase text-andesnavy
+              text-[clamp(2rem,4.4vw,3rem)] leading-[1.05] tracking-wide
+            "
+          >
+            {t("team.title")}
+          </h2>
+        </header>
 
-        <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="mt-4 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {MEMBERS.map((m, i) => {
-            // Nombre sin edad al final por si viene en i18n (e.g., "Juan, 23")
             const rawName = t(`team.members.${m.key}.name`);
             const cleanName = String(rawName).replace(/,\s*\d+\s*$/g, "");
-
-            // Degradado que llega hasta abajo (100%)
             const imgBg = `linear-gradient(180deg, ${m.theme}66 0%, ${m.theme}22 40%, #ffffff 100%)`;
 
             return (
@@ -84,15 +93,16 @@ const TeamSection: FC = () => {
                 whileHover={{ y: -3, rotate: 0.0001 }}
                 className="relative overflow-hidden rounded-[26px] bg-white shadow-[0_10px_30px_rgba(0,0,0,.07)] ring-1 ring-black/5 flex flex-col"
               >
-                {/* Pestaña superior */}
+                {/* Pestaña superior del color del miembro */}
                 <div className="h-3 w-full" style={{ background: m.theme }} />
 
-                {/* Encabezado + bio */}
+                {/* Contenido textual */}
                 <div className="px-5 pt-4 pb-3">
                   <div className="flex items-start justify-between gap-3">
                     <span className="inline-flex items-center rounded-full bg-black/5 px-3 py-1 text-[11px] font-semibold text-neutral-800">
                       {t("team.ageLabel", { defaultValue: "{{count}} años", count: m.age })}
                     </span>
+
                     <a
                       href={m.songUrl || "#"}
                       target="_blank"
@@ -117,7 +127,7 @@ const TeamSection: FC = () => {
                   </p>
                 </div>
 
-                {/* FOTO FULL-BLEED pegada al borde inferior */}
+                {/* Imagen al borde inferior, con fondo degradado suave del tema */}
                 <div className="relative w-full flex-1" style={{ background: imgBg }}>
                   <img
                     src={m.img}

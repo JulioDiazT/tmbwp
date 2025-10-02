@@ -4,20 +4,20 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useTranslation } from "react-i18next";
 
-import CBTLogoUrl         from "../assets/CBT.png";
-import UDALogoUrl         from "../assets/uda.png";
-import UCuencaLogoUrl     from "../assets/ucuenca.png";
-import S2CitiesLogoUrl    from "../assets/S2C.png";
-import AmaruLogoUrl       from "../assets/Amaru.png";
-import MunchiesLogoUrl    from "../assets/munchies.png";
-import BHLogoUrl          from "../assets/BH.png";
-import GIBUrl             from "../assets/GIB.png";
-import CUENCAUrl          from "../assets/Cuenca.png";
-import HUASIPICHANGAUrl   from "../assets/huasi.png";
-import INTEGRARUrl        from "../assets/integrar.png";
-import PROCREDITUrl       from "../assets/BP.png";
-import EMOVUrl            from "../assets/emov.png";
-import AFUrl              from "../assets/AF.png";
+import CBTLogoUrl       from "../assets/CBT.png";
+import UDALogoUrl       from "../assets/uda.png";
+import UCuencaLogoUrl   from "../assets/ucuenca.png";
+import S2CitiesLogoUrl  from "../assets/S2C.png";
+import AmaruLogoUrl     from "../assets/Amaru.png";
+import MunchiesLogoUrl  from "../assets/munchies.png";
+import BHLogoUrl        from "../assets/BH.png";
+import GIBUrl           from "../assets/GIB.png";
+import CUENCAUrl        from "../assets/Cuenca.png";
+import HUASIPICHANGAUrl from "../assets/huasi.png";
+import INTEGRARUrl      from "../assets/integrar.png";
+import PROCREDITUrl     from "../assets/BP.png";
+import EMOVUrl          from "../assets/emov.png";
+import AFUrl            from "../assets/AF.png";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -47,7 +47,7 @@ const SPONSORS: Alliance[] = [
   { name: "BH Bikes",         src: BHLogoUrl },
 ];
 
-const LOGO_SIZE = "h-16 md:h-20 lg:h-24 w-auto";              // alturas “redondas”
+const LOGO_SIZE = "h-16 md:h-20 lg:h-24 w-auto";
 const PRIMARY_LOGO_SIZE = "h-24 md:h-28 lg:h-32 w-auto";
 
 function LogosGrid({ list, sizeClass = LOGO_SIZE }: { list: Alliance[]; sizeClass?: string }) {
@@ -88,31 +88,43 @@ const AlliancesLogos: FC = () => {
   }, []);
 
   return (
-    <section ref={sectionRef} className="py-16 bg-white">
-      <div className="mx-auto max-w-6xl px-4 space-y-14">
-        <h2 className="text-3xl md:text-4xl font-extrabold text-andesnavy text-center uppercase tracking-wide">
-          {t("alliances.title")}
-        </h2>
+    <section ref={sectionRef} className="py-20 bg-white">
+      <div className="mx-auto max-w-6xl px-4 sm:px-6">
+        {/* Encabezado simple (solo el que viene de i18n) */}
+        <header className="mb-12 sm:mb-14 text-center">
+          <div className="mx-auto h-1.5 w-20 rounded-full bg-[#d6ef0a]" />
+          <h2
+            className="
+              mt-3 font-rubikOne uppercase text-andesnavy
+              text-[clamp(2rem,4.4vw,3rem)] leading-[1.05] tracking-wide
+            "
+          >
+            {t("alliances.title")}
+          </h2>
+        </header>
 
-        <div className="space-y-6">
-          <h3 className="text-xl font-semibold text-tmbred text-center uppercase tracking-wide">
-            {t("alliances.primary")}
-          </h3>
-          <LogosGrid list={PRIMARY_ALLIES} sizeClass={PRIMARY_LOGO_SIZE} />
-        </div>
+        {/* Bloques */}
+        <div className="space-y-14">
+          <div className="space-y-6">
+            <h3 className="text-center text-sm sm:text-base font-bold uppercase tracking-wide text-andesnavy">
+              {t("alliances.primary")}
+            </h3>
+            <LogosGrid list={PRIMARY_ALLIES} sizeClass={PRIMARY_LOGO_SIZE} />
+          </div>
 
-        <div className="space-y-6">
-          <h3 className="text-xl font-semibold text-tmbred text-center uppercase tracking-wide">
-            {t("alliances.institutions")}
-          </h3>
-          <LogosGrid list={INSTITUTIONS} />
-        </div>
+          <div className="space-y-6">
+            <h3 className="text-center text-sm sm:text-base font-bold uppercase tracking-wide text-andesnavy">
+              {t("alliances.institutions")}
+            </h3>
+            <LogosGrid list={INSTITUTIONS} />
+          </div>
 
-        <div className="space-y-6">
-          <h3 className="text-xl font-semibold text-tmbred text-center uppercase tracking-wide">
-            {t("alliances.sponsors")}
-          </h3>
-          <LogosGrid list={SPONSORS} />
+          <div className="space-y-6">
+            <h3 className="text-center text-sm sm:text-base font-bold uppercase tracking-wide text-andesnavy">
+              {t("alliances.sponsors")}
+            </h3>
+            <LogosGrid list={SPONSORS} />
+          </div>
         </div>
       </div>
     </section>
