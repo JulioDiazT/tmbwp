@@ -1,7 +1,6 @@
-import React, { Suspense, lazy } from "react";
+import{ Suspense, lazy } from "react";
 
 const CycleStacksList = lazy(() => import("./CycleStacksList"));
-const DatawrapperEmbed = lazy(() => import("../components/DatawrapperEmbed"));
 
 export default function CycleStacks() {
   return (

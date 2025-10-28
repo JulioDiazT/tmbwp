@@ -1,5 +1,5 @@
 // src/components/DatawrapperEmbed.tsx
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 type Props = {
   chartId: string;               // ej: "zsQUP"
