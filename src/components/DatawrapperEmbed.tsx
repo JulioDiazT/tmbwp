@@ -1,16 +1,13 @@
-import  { useEffect, useRef } from "react";
+// src/components/DatawrapperEmbed.tsx
+import React, { useEffect, useMemo, useRef, useState } from "react";
 
 type Props = {
-  /** ID del chart en Datawrapper, p.ej. "zsQUP" */
-  chartId: string;
-  /** Título accesible para el iframe */
+  chartId: string;               // ej: "zsQUP"
+  version?: string | number;     // ej: 1, 2, 3... (tras REPUBLISH cambia)
   title?: string;
-  /** Altura inicial mientras llega el ajuste automático */
   initialHeight?: number;
-  /** Versión/opción de embed si la usas (normalmente "1") */
-  version?: string | number;
-  /** Clase opcional para estilos */
   className?: string;
+  cacheKey?: string | number;    // opcional, para forzar recarga si el navegador cachea
 };
 
 const DATAWRAPPER_ORIGINS = new Set([
@@ -18,82 +15,69 @@ const DATAWRAPPER_ORIGINS = new Set([
   "https://www.datawrapper.de",
 ]);
 
-/**
- * Componente para embeber gráficos de Datawrapper con auto-resize.
- * Uso:
- *   <DatawrapperEmbed chartId="zsQUP" title="Global CO₂ emissions by fuel and industry" />
- */
+function useInView<T extends HTMLElement>(options?: IntersectionObserverInit) {
+  const ref = useRef<T | null>(null);
+  const [inView, setInView] = useState(false);
+  useEffect(() => {
+    if (!ref.current) return;
+    const io = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting) setInView(true);
+    }, options);
+    io.observe(ref.current);
+    return () => io.disconnect();
+  }, [options]);
+  return { ref, inView } as const;
+}
+
 export default function DatawrapperEmbed({
   chartId,
+  version = 1,
   title = "Datawrapper chart",
   initialHeight = 480,
-  version = 1,
   className,
+  cacheKey,
 }: Props) {
   const iframeRef = useRef<HTMLIFrameElement | null>(null);
+  const { ref, inView } = useInView<HTMLDivElement>({ rootMargin: "200px" });
+  const [height, setHeight] = useState(initialHeight);
+
+  const src = useMemo(() => {
+    const base = `https://datawrapper.dwcdn.net/${chartId}/${version}/`;
+    return cacheKey ? `${base}?k=${encodeURIComponent(String(cacheKey))}` : base;
+  }, [chartId, version, cacheKey]);
 
   useEffect(() => {
     function onMessage(event: MessageEvent) {
-      // Seguridad: sólo aceptar mensajes de Datawrapper
-      // Si no puedes depender del origin (algunos proxys), elimina esta validación.
-      if (event.origin && !Array.from(DATAWRAPPER_ORIGINS).includes(event.origin)) return;
-
+      if (event.origin && !DATAWRAPPER_ORIGINS.has(event.origin)) return;
       const data = event.data as Record<string, any>;
-      if (!data || typeof data !== "object") return;
-
-      const heights = data["datawrapper-height"] as Record<string, number> | undefined;
+      const heights = data?.["datawrapper-height"] as Record<string, number> | undefined;
       if (!heights) return;
-
-      // Datawrapper envía un objeto { [chartId]: height }
-      // Ajusta la altura del iframe que corresponda.
-      const iframe = iframeRef.current;
-      if (!iframe) return;
-
-      // Si el mensaje trae una clave exacta del chartId, úsala.
-      if (heights[chartId]) {
-        iframe.style.height = `${heights[chartId]}px`;
-        return;
-      }
-
-      // Fallback: si no coincide, pero hay alguna altura, y el mensaje proviene del mismo contentWindow
-      // (útil cuando hay varios iframes en la página).
-      if (event.source && iframe.contentWindow === event.source) {
-        // Toma el primer valor disponible
-        const firstKey = Object.keys(heights)[0];
-        if (firstKey) {
-          iframe.style.height = `${heights[firstKey]}px`;
-        }
-      }
+      const h = heights[chartId] ?? heights[Object.keys(heights)[0]];
+      if (typeof h === "number" && h > 0) setHeight(h);
     }
-
     window.addEventListener("message", onMessage);
     return () => window.removeEventListener("message", onMessage);
   }, [chartId]);
 
-  const src = `https://datawrapper.dwcdn.net/${chartId}/${version}/`;
-
   return (
-    <div className={className} style={{ width: "100%" }}>
-      <iframe
-        ref={iframeRef}
-        title={title}
-        id={`datawrapper-chart-${chartId}`}
-        src={src}
-        scrolling="no"
-        frameBorder={0}
-        loading="lazy"
-        // estilo recomendado por Datawrapper para ancho fluido
-        style={{
-          width: 0,
-          minWidth: "100%",
-          border: "none",
-          height: initialHeight,
-        }}
-        // hint para navegadores móviles
-        allow="clipboard-read; clipboard-write"
-        // marca para integraciones externas
-        data-external="1"
-      />
+    <div ref={ref} className={className} style={{ width: "100%" }} aria-label={title}>
+      {inView ? (
+        <iframe
+          ref={iframeRef}
+          id={`datawrapper-chart-${chartId}`}
+          title={title}
+          src={src}
+          scrolling="no"
+          frameBorder={0}
+          loading="lazy"
+          style={{ width: "100%", border: "none", height }}
+          data-external="1"
+          referrerPolicy="no-referrer-when-downgrade"
+          sandbox="allow-scripts allow-same-origin allow-presentation"
+        />
+      ) : (
+        <div className="w-full rounded-xl bg-neutral-100 animate-pulse" style={{ height }} />
+      )}
     </div>
   );
 }
