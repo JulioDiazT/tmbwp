@@ -1,11 +1,11 @@
-import  { useEffect, useRef, useState } from "react";
+// src/pages/CycleStackBookDetails.tsx
+import { useEffect, useRef, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { db } from "../firebase";
 import { doc, getDoc, DocumentData } from "firebase/firestore";
 import { resolveFast, resolveInBackground } from "../utils/storageFast";
 import { downloadFile, guessFileName } from "../utils/downloadFile";
-// Si no usas pdfProxy.ts, elimina este import y su uso dentro del efecto.
 import { normalizeDocUrl, maybeProxy } from "../utils/pdfProxy";
 import { Download, ExternalLink, BookOpen, Calendar, User } from "lucide-react";
 
@@ -33,12 +33,51 @@ function pickLocalizedFrom(obj: Record<string, unknown>, bases: string[], lang: 
   return fb;
 }
 function timeout<T>(p: Promise<T>, ms: number, tag = "op") {
-  return new Promise<T>((res, rej) => { const t = setTimeout(()=>rej(new Error(`${tag}-timeout-${ms}ms`)), ms); p.then(v=>{clearTimeout(t);res(v)}).catch(e=>{clearTimeout(t);rej(e)})});
+  return new Promise<T>((res, rej) => {
+    const t = setTimeout(() => rej(new Error(`${tag}-timeout-${ms}ms`)), ms);
+    p.then(v => { clearTimeout(t); res(v); }).catch(e => { clearTimeout(t); rej(e); });
+  });
 }
 async function resolveRef(refLike: unknown) {
-  const tries = [() => timeout(resolveFast(refLike),1500,"fast"), () => timeout(resolveInBackground(refLike),2500,"bg1"), () => timeout(resolveInBackground(refLike),3500,"bg2")];
+  const tries = [
+    () => timeout(resolveFast(refLike), 1500, "fast"),
+    () => timeout(resolveInBackground(refLike), 2500, "bg1"),
+    () => timeout(resolveInBackground(refLike), 3500, "bg2"),
+  ];
   for (const run of tries) { try { const u = await run(); if (u) return u; } catch {} }
   return undefined;
+}
+
+/** Devuelve URL de pdf.js solo para orígenes con CORS OK (Firebase Storage). */
+function toViewerUrl(src: string) {
+  try {
+    const u = new URL(src);
+    const host = u.hostname;
+    const isFB =
+      host.includes("firebasestorage.googleapis.com") ||
+      host.includes("storage.googleapis.com");
+    if (isFB) {
+      return `https://mozilla.github.io/pdf.js/web/viewer.html?file=${encodeURIComponent(src)}`;
+    }
+    return "";
+  } catch {
+    return "";
+  }
+}
+
+/** Para URLs de Google Drive, genera la URL del visor de Drive. */
+function drivePreviewUrl(src: string) {
+  try {
+    const u = new URL(src);
+    if (!u.hostname.includes("drive.google.com")) return "";
+    const id = u.searchParams.get("id");
+    if (id) return `https://drive.google.com/file/d/${id}/preview`;
+    const m = u.pathname.match(/\/file\/d\/([^/]+)/);
+    if (m?.[1]) return `https://drive.google.com/file/d/${m[1]}/preview`;
+    return "";
+  } catch {
+    return "";
+  }
 }
 
 export default function CycleStackBookDetails() {
@@ -65,7 +104,9 @@ export default function CycleStackBookDetails() {
         if (!snap.exists()) { setState(null); setLoading(false); return; }
         const v = snap.data() as DocumentData as BookDoc;
 
-        const title = pickLocalizedFrom(v as any, ["title", "name"], L, "") || String(v.title ?? v.name ?? "");
+        const title =
+          pickLocalizedFrom(v as any, ["title", "name"], L, "") ||
+          String(v.title ?? v.name ?? "");
         const author = String(v.author ?? v.autor ?? "");
         const year = v.year ?? "";
         const description =
@@ -76,11 +117,14 @@ export default function CycleStackBookDetails() {
 
         setState({ id, title, author, year, description });
 
-        const resolved = await resolveRef(v.fileUrl ?? v.doc);
+        const resolvedRaw = await resolveRef(v.fileUrl ?? v.doc);
         if (!alive.current || cancelled) return;
-        if (resolved) {
-          let finalUrl = resolved;
-          try { finalUrl = maybeProxy(normalizeDocUrl(resolved)) || normalizeDocUrl(resolved); } catch {}
+        if (resolvedRaw) {
+          let finalUrl = resolvedRaw;
+          try {
+            const normalized = normalizeDocUrl(resolvedRaw);
+            finalUrl = maybeProxy(normalized) || normalized;
+          } catch {}
           setState(s => s ? { ...s, fileUrlResolved: finalUrl } : s);
         }
         setLoading(false);
@@ -92,13 +136,35 @@ export default function CycleStackBookDetails() {
   }, [id, L, t]);
 
   const fileUrl = state?.fileUrlResolved || "";
-  const openInNewTab = () => { if (fileUrl) window.open(fileUrl, "_blank", "noopener,noreferrer"); };
+
+  // Solo abre en pestaña (nada de descarga aquí).
+  const openInNewTab = () => {
+    if (!fileUrl) return;
+    const pdfJs = toViewerUrl(fileUrl);
+    if (pdfJs) {
+      window.open(pdfJs, "_blank", "noopener,noreferrer");
+      return;
+    }
+    const gPreview = drivePreviewUrl(fileUrl);
+    if (gPreview) {
+      window.open(gPreview, "_blank", "noopener,noreferrer");
+      return;
+    }
+    window.open(fileUrl, "_blank", "noopener,noreferrer");
+  };
+
+  // Descarga explícita (si falla, abrimos la URL tal cual).
   const onDownload = async () => {
     if (!fileUrl) return;
     try {
-      const name = guessFileName(fileUrl, `${state?.title || (L === "es" ? "documento" : "document")}.pdf`);
+      const name = guessFileName(
+        fileUrl,
+        `${state?.title || (L === "es" ? "documento" : "document")}.pdf`
+      );
       await downloadFile(fileUrl, name);
-    } catch { openInNewTab(); }
+    } catch {
+      window.open(fileUrl, "_blank", "noopener,noreferrer");
+    }
   };
 
   if (!id) return null;
@@ -139,7 +205,7 @@ export default function CycleStackBookDetails() {
           {/* eyebrow */}
           <div className="h-2 w-24 rounded-full mb-5" style={{ background: ACCENT }} />
 
-          {/* título (un poco más pequeño) */}
+          {/* título */}
           <h1 className="font-rubikOne uppercase tracking-wide text-andesnavy text-[clamp(1.9rem,4.6vw,3.1rem)] leading-[1.06]">
             {state.title}
           </h1>
@@ -148,13 +214,17 @@ export default function CycleStackBookDetails() {
           <div className="mt-4 flex flex-wrap gap-2 text-[0.95rem]">
             <span className="inline-flex items-center gap-2 rounded-full bg-white shadow-sm ring-1 ring-black/10 px-3.5 py-1.5 text-andesnavy">
               <User size={17} className="opacity-70" />
-              <strong className="font-semibold">{t("cyclestacks.author", { defaultValue: L === "es" ? "Autor" : "Author" }) as string}</strong>
+              <strong className="font-semibold">
+                {t("cyclestacks.author", { defaultValue: L === "es" ? "Autor" : "Author" }) as string}
+              </strong>
               <span aria-hidden>·</span>
               <span>{state.author || (L === "es" ? "Desconocido" : "Unknown")}</span>
             </span>
             <span className="inline-flex items-center gap-2 rounded-full bg-white shadow-sm ring-1 ring-black/10 px-3.5 py-1.5 text-andesnavy">
               <Calendar size={17} className="opacity-70" />
-              <strong className="font-semibold">{t("cyclestacks.year", { defaultValue: L === "es" ? "Año" : "Year" }) as string}</strong>
+              <strong className="font-semibold">
+                {t("cyclestacks.year", { defaultValue: L === "es" ? "Año" : "Year" }) as string}
+              </strong>
               <span aria-hidden>·</span>
               <span>{String(state.year || "—")}</span>
             </span>
@@ -166,7 +236,7 @@ export default function CycleStackBookDetails() {
         </div>
       </section>
 
-      {/* CONTENIDO — Card a TODO el ancho del contenedor (alineada con título/chips) */}
+      {/* CONTENIDO */}
       <div className="mx-auto max-w-6xl px-4 md:px-6 py-8">
         <div className="w-full rounded-[22px] bg-white/85 backdrop-blur supports-[backdrop-filter]:bg-white/70 ring-1 ring-black/10 p-6 md:p-7 shadow-[0_12px_34px_rgba(0,0,0,.06)]">
           <p className="text-[1.06rem] md:text-[1.12rem] leading-[1.75] text-andesnavy/90 whitespace-pre-line">
